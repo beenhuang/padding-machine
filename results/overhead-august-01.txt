@@ -1,0 +1,13 @@
+total trace: [20,000] 
+
+sent_nonpadding: [3,776,129] , sent_padding: [4,893,774] 
+recv_nonpadding: [33,721,096] , recv_padding: [13,768,519] 
+
+sent cells: [8,669,903] , sent/(sent+recv)= [15%] 
+recv cells: [47,489,615] , recv/(sent+recv)= [85%] 
+total cells: [56,159,518] 
+
+Avg sent bandwidth: sent/sent_nonpadding= [230%] 
+Avg recv bandwidth: recv/recv_nonpadding= [141%] 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= [150%]
