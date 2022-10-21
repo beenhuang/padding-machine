@@ -1,0 +1,1 @@
+this directory used for saving simulated traces.
