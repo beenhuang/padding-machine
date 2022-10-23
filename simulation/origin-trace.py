@@ -30,6 +30,8 @@ CIRCPAD_ADDRESS_EVENT = "connection_ap_handshake_send_begin"
 NONPADDING_SENT = 1.0
 NONPADDING_RECV = -1.0
 
+MAX_LENGTH = 5000
+
 def get_logger():
     logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO)
     logger = logging.getLogger(splitext(basename(__file__))[0])
@@ -147,14 +149,14 @@ def main():
 
     X, y = [], []
     for ID,_ in dataset.items():
-        X.append(dataset[ID])
+        X.append(dataset[ID][:MAX_LENGTH])
         y.append(labels[ID])
         
     # 3. save original dataset&labels  
-    output_file = join(OUTPUT_DIR, CURRENT_TIME+args["out"]+".pkl")
+    output_file = join(OUTPUT_DIR, CURRENT_TIME+args["out"]+"-"+str(MAX_LENGTH)+".pkl")
     with open(output_file, "wb") as f:
         pickle.dump((X, y), f)
-        logger.info(f"[SAVED] original dataset,labels to the {args['out']+'.pkl'}") 
+        logger.info(f"[SAVED] original dataset,labels to the {args['out']+'.pkl'} file") 
 
 
     logger.info(f"{MODULE_NAME}: completed successfully.\n")
