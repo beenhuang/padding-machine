@@ -30,8 +30,6 @@ CIRCPAD_ADDRESS_EVENT = "connection_ap_handshake_send_begin"
 NONPADDING_SENT = 1.0
 NONPADDING_RECV = -1.0
 
-MAX_LENGTH = 5000
-
 def get_logger():
     logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO)
     logger = logging.getLogger(splitext(basename(__file__))[0])
@@ -47,6 +45,7 @@ def parse_arguments():
     parser.add_argument("-i", "--in", required=True, metavar="<original_trace>", help="load original traces.")
     # 2. OUTPUT: save overhead in the overhead-*.txt file
     parser.add_argument("-o", "--out", required=True, metavar="<simulated_trace>", help="save simulated traces.")
+    parser.add_argument("--maxlength", required=True, type=int, default=-1, help="max length of extracted cells")
 
     args = vars(parser.parse_args())
 
@@ -149,11 +148,11 @@ def main():
 
     X, y = [], []
     for ID,_ in dataset.items():
-        X.append(dataset[ID][:MAX_LENGTH])
+        X.append(dataset[ID][:args["maxlength"]])
         y.append(labels[ID])
         
     # 3. save original dataset&labels  
-    output_file = join(OUTPUT_DIR, CURRENT_TIME+args["out"]+"-"+str(MAX_LENGTH)+".pkl")
+    output_file = join(OUTPUT_DIR, CURRENT_TIME+args["out"]+"-"+str(args["maxlength"])+".pkl")
     with open(output_file, "wb") as f:
         pickle.dump((X, y), f)
         logger.info(f"[SAVED] original dataset,labels to the {args['out']+'.pkl'} file") 

@@ -4,10 +4,10 @@
 #
 # all parameters:
 # origin-trace.py --in <data_folder> --out <file_name> 
-#
 
 for i in {1..5}
 do
-    ./origin-trace.py --in standard --out original
+    echo run $i times.
+    ./origin-trace.py --in standard --out original  --maxlength 5000
     sleep 5m
 done
