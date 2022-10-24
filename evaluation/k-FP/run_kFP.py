@@ -129,13 +129,40 @@ def knn_classifier(labeled_fps, new_fp, k=K):
 
 
 # [FUNC] get metrics values
-def get_metrics(y_true, y_pred):
-    accuracy = accuracy_score(y_true, y_pred)
-    precision = precision_score(y_true, y_pred, average='macro')
-    recall = recall_score(y_true, y_pred, average='macro')
-    f1 = f1_score(y_true, y_pred, average='macro')
+def get_metrics(y_true, y_pred, label_unmon):
+    print(f"label_unmon: {label_unmon}")
+    # TP, FP-P, FP-N, TN, FN
+    tp, fpp, fpn, tn, fn = 0, 0, 0, 0, 0
+
+    # traverse preditions
+    for i in range(len(y_pred)):
+        if y_pred[i] == y_true[i] and y_true[i] != label_unmon:
+            tp += 1
+        elif y_pred[i] == y_true[i] and y_true[i] == label_unmon:
+            tn += 1
+        elif y_pred[i] != y_true[i] and y_true[i] == label_unmon:
+            fn += 1    
+        elif y_pred[i] != y_true[i] and y_true[i] != label_unmon:
+            if y_pred[i] != label_unmon:
+                fpp += 1
+            elif y_pred[i] == label_unmon:
+                fpn += 1
+        else:
+            sys.exit(f"[ERROR]: {y_pred[i]}, {y_true[i]}")        
+
+
+    # accuracy
+    accuracy = (tp+tn) / float(tp+fpp+fpn+fn+tn)
+    # precision      
+    precision = tp / float(tp+fpp+fpn)
+    # recall
+    recall = tp / float(tp+fpp+fn)
+    # F1
+    f1 = 2*(precision*recall) / float(precision+recall)
 
     lines = []
+    lines.append(f"tp: {tp}, fpp: {fpp}, fpn: {fpn}\n")
+    lines.append(f"tn: {tn}, fn: {fn}\n\n")
     lines.append(f"accuracy: {accuracy}\n")
     lines.append(f"precision: {precision}\n")
     lines.append(f"recall: {recall}\n")
@@ -171,7 +198,7 @@ def main():
     logger.info(f"[GOT] predicted labels of test samples.")
     
     # get metrics value
-    lines = get_metrics(y_test, y_pred)
+    lines = get_metrics(y_test, y_pred, max(y_test))
     logger.info(f"[CALCULATED] metrics.")
     
     with open(join(OUTPUT_DIR, CURRENT_TIME+args["out"]+".txt"), "w") as f:
