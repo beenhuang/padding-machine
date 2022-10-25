@@ -131,43 +131,45 @@ def knn_classifier(labeled_fps, new_fp, k=K):
 # [FUNC] get metrics values
 def get_metrics(y_true, y_pred, label_unmon):
     print(f"label_unmon: {label_unmon}")
-    # TP, FP-P, FP-N, TN, FN
-    tp, fpp, fpn, tn, fn = 0, 0, 0, 0, 0
+    # TP-correct, TP-incorrect, FN  TN, FN
+    tp_c, tp_i, fn, tn, fp = 0, 0, 0, 0, 0
 
     # traverse preditions
     for i in range(len(y_pred)):
-        if y_pred[i] == y_true[i] and y_true[i] != label_unmon:
-            tp += 1
-        elif y_pred[i] == y_true[i] and y_true[i] == label_unmon:
+        # [case_1]: positive sample, and predict positive and correct.
+        if y_true[i] != label_unmon and y_pred[i] != label_unmon and y_pred[i] == y_true[i]:
+            tp_c += 1
+        # [case_2]: positive sample, predict positive but incorrect class.
+        elif y_true[i] != label_unmon and y_pred[i] != label_unmon and y_pred[i] != y_true[i]:
+            tp_i += 1
+        # [case_3]: positive sample, predict negative.
+        elif y_true[i] != label_unmon and y_pred[i] == label_unmon:
+            fn += 1
+        # [case_4]: negative sample, predict negative.    
+        elif y_true[i] == label_unmon and y_pred[i] == y_true[i]:
             tn += 1
-        elif y_pred[i] != y_true[i] and y_true[i] == label_unmon:
-            fn += 1    
-        elif y_pred[i] != y_true[i] and y_true[i] != label_unmon:
-            if y_pred[i] != label_unmon:
-                fpp += 1
-            elif y_pred[i] == label_unmon:
-                fpn += 1
+        # [case_5]: negative sample, predict positive    
+        elif y_true[i] == label_unmon and y_pred[i] != y_true[i]:
+            fp += 1   
         else:
             sys.exit(f"[ERROR]: {y_pred[i]}, {y_true[i]}")        
 
-
     # accuracy
-    accuracy = (tp+tn) / float(tp+fpp+fpn+fn+tn)
+    accuracy = (tp_c+tn) / float(tp_c+tp_i+fn+tn+fp)
     # precision      
-    precision = tp / float(tp+fpp+fpn)
+    precision = tp_c / float(tp_c+tp_i+fp)
     # recall
-    recall = tp / float(tp+fpp+fn)
-    # F1
+    recall = tp_c / float(tp_c+tp_i+fn)
+    # F-score
     f1 = 2*(precision*recall) / float(precision+recall)
 
     lines = []
-    lines.append(f"tp: {tp}, fpp: {fpp}, fpn: {fpn}\n")
-    lines.append(f"tn: {tn}, fn: {fn}\n\n")
+    lines.append(f"[POS] TP-c: {tp_c},  TP-i(incorrect class): {tp_i},  FN: {fn}\n")
+    lines.append(f"[NEG] TN: {tn},  FP: {fp}\n\n")
     lines.append(f"accuracy: {accuracy}\n")
     lines.append(f"precision: {precision}\n")
     lines.append(f"recall: {recall}\n")
     lines.append(f"F1: {f1}\n")
-
     return lines
 
 
