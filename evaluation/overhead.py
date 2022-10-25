@@ -17,7 +17,7 @@ from os.path import join, basename, abspath, splitext, dirname, pardir, isdir
 
 # CONSTANTS
 MODULE_NAME = basename(__file__)
-CURRENT_TIME = time.strftime("%Y.%m.%d-c%H:%M:%S", time.localtime())
+CURRENT_TIME = time.strftime("%Y.%m.%d-%H:%M:%S_", time.localtime())
 
 BASE_DIR = abspath(join(dirname(__file__), pardir))
 INPUT_DIR = join(BASE_DIR, "simulation", "sim-traces")
