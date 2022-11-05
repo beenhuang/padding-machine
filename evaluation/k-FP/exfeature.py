@@ -249,7 +249,6 @@ def extract_features(trace):
 
 
 if __name__ == "__main__":
-    #
     BASE_DIR = abspath(dirname(__file__), pardir, pardir)
     INPUT_DIR = join(BASE_DIR, "data", "standard")
     FILE_NAME = "24_7"
