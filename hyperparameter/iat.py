@@ -178,6 +178,7 @@ def main():
     make_iat_plot(mon_iats, "mon-"+args["out"])
     make_iat_plot(unmon_iats, "unmon-"+args["out"])  
     logger.info(f"MAKED iat plots.")
+    sys.exit()
 
     # 4. fit iat to distribution
     logger.info(f"FITTING iats to the distribution ...")

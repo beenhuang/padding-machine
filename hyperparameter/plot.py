@@ -25,7 +25,7 @@ def show_bar_plot(x, y, plt_title, x_label, y_label):
 #
 def save_bar_plot(x, y, file, plt_title, x_label, y_label):
     p = plt.bar(x, y, tick_label=x)
-    plt.bar_label(p, label_type='edge')
+    plt.bar_label(p, label_type="edge")
 
     plt.title(plt_title)
     plt.xlabel(x_label)

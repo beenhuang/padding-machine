@@ -145,6 +145,7 @@ def main():
     make_burst_plot(mon_bursts, f"mon-{args['out']}")
     make_burst_plot(unmon_bursts, f"unmon-{args['out']}")    
     logger.info(f"MAKED iat plots.")
+    sys.exit()
 
     # 4. fit data to distribution
     logger.info(f"FITTING iats to the distribution ...")
