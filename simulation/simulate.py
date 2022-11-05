@@ -116,11 +116,9 @@ def add_machines(client_machine, relay_machine, tor):
 
 
 def run_simualte(todo):
-    # process pool
-    pool = mp.Pool(mp.cpu_count())
-    result = pool.starmap(run_simulate_once, todo)
-    pool.close()
-    print(f"[COMPLETED] all simulation experiments.")
+    with mp.Pool(mp.cpu_count()) as pool:
+        result = pool.starmap(run_simulate_once, todo)
+        print(f"[COMPLETED] all simulation experiments.")
 
     return dict(result)
 
