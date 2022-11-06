@@ -29,13 +29,13 @@ from dfnet import DFNet
 
 # constants: module-name, file-path, batch-size
 MODULE_NAME = basename(__file__)
-CURRENT_TIME = time.strftime("%Y.%m.%d-c%H:%M:%S", time.localtime())
+CURRENT_TIME = time.strftime("%Y.%m.%d-%H:%M:%S", time.localtime())
 
 BASE_DIR = abspath(join(dirname(__file__), pardir, pardir))
 INPUT_DIR = join(BASE_DIR, "simulation", "sim-traces")
-OUTPUT_DIR = join(BASE_DIR, "results", "1104")
+OUTPUT_DIR = join(BASE_DIR, "results")
 CONFIG_DIR = join(BASE_DIR, "evaluation", "df")
-TRAINED_DF_DIR = join(BASE_DIR, "evaluation", "df", "model")
+TRAINED_DF_DIR = join(BASE_DIR, "evaluation", "df", "trained-model")
 
 NONPADDING_SENT = 1.0
 NONPADDING_RECV = -1.0
@@ -116,16 +116,16 @@ def spilt_dataset(X, y):
     # split to train & test [8:2]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=247, stratify=y)
     # split to validation & test [1:1]
-    X_valid, X_test, y_valid, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=247, stratify=y_test)
+    #X_valid, X_test, y_valid, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=247, stratify=y_test)
 
     train_data = DFDataset(X_train, y_train)
-    valid_data = DFDataset(X_valid, y_valid)
+    #valid_data = DFDataset(X_valid, y_valid)
     test_data = DFDataset(X_test, y_test)
 
-    print(f"[SPLITED] traning size: {len(train_data)}, validation size: {len(valid_data)}, test size: {len(test_data)}")
+    print(f"[SPLITED] traning size: {len(train_data)}, test size: {len(test_data)}")
+    #print(f"[SPLITED] traning size: {len(train_data)}, validation size: {len(valid_data)}, test size: {len(test_data)}")
 
-
-    return train_data, valid_data, test_data
+    return train_data, test_data
   
 
 # dataloader : training=16,000 , batch_size=750, num_batch=22
@@ -345,7 +345,7 @@ def main():
 
     # 1. load dataset
     X, y = preprocess_data(join(INPUT_DIR, args["in"]))
-    train_data, valid_data, test_data = spilt_dataset(X, y)
+    train_data, test_data = spilt_dataset(X, y)
 
     # select cpu/gpu mode
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -357,7 +357,7 @@ def main():
 
     # training/validation dataloader: 
     train_dataloader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
-    valid_dataloader = DataLoader(valid_data, batch_size=BATCH_SIZE, shuffle=True)
+    #valid_dataloader = DataLoader(valid_data, batch_size=BATCH_SIZE, shuffle=True)
 
     # create DFNet model    
     df_net = DFNet(CLASSES).to(device)         
@@ -373,7 +373,7 @@ def main():
         # train DF model
         train_loop(train_dataloader, df_net, loss_function, optimizer, device)
         # validate DF model
-        validate_loop(valid_dataloader, df_net, device)
+        #validate_loop(valid_dataloader, df_net, device)
 
     logger.info(f"----- [TRAINING] Completed -----")
 
@@ -395,7 +395,7 @@ def main():
     lines = test(test_dataloader, df_net, device, CLASSES)
     
     # save testing results
-    with open(join(OUTPUT_DIR, CURRENT_TIME+args["out"]+".txt"), "w") as f:
+    with open(join(OUTPUT_DIR, args["out"]+".txt"), "w") as f:
         f.writelines(lines)
         logger.info(f"[SAVED] testing results, file-name: {args['out']}")
 

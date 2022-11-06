@@ -22,7 +22,7 @@ def get_general_trace(trace):
     # the timestamp of the first package is 0.
     trace[:,0] -= trace[0,0]  
     # nanosecond convert to second
-    trace[:,0] *= 0.0000000001
+    trace[:,0] *= 0.000000001
 
     return trace
 
@@ -249,6 +249,7 @@ def extract_features(trace):
 
 
 if __name__ == "__main__":
+    #
     BASE_DIR = abspath(dirname(__file__), pardir, pardir)
     INPUT_DIR = join(BASE_DIR, "data", "standard")
     FILE_NAME = "24_7"

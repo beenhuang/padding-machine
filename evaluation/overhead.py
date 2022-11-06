@@ -150,7 +150,7 @@ def main():
     
 
     # [3] write bandwidth overhead to the file.
-    with open(join(OUTPUT_DIR, CURRENT_TIME+args["out"]+".txt"), "w") as f:
+    with open(join(OUTPUT_DIR, args["out"]+".txt"), "w") as f:
         f.writelines(lines)
         logger.info(f"[SAVED] bandwidth overhead in the {args['out']}")
 
@@ -160,3 +160,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+

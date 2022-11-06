@@ -31,6 +31,19 @@
 
 
   /********************  [START OF STATES]  *********************/
+  
+  /* short define for sampling uniformly random [0, 1.0]  */
+  const struct uniform_t my_uniform = {
+    .base = UNIFORM(my_uniform),
+    .a = 0.0,
+    .b = 1.0,
+  };
+
+  #define CIRCPAD_UNI_RAND (dist_sample(&my_uniform.base))
+
+  /* uniformly random select a distribution parameters between [0, 10] */
+  #define CIRCPAD_RAND_DIST_PARAM1 (CIRCPAD_UNI_RAND *10) 
+  #define CIRCPAD_RAND_DIST_PARAM2 (CIRCPAD_UNI_RAND *10)
 
   /**
    * length = MIN((start_length + length_dist), max_length)
@@ -59,14 +72,14 @@
   relay_machine->states[2].length_dist.type = CIRCPAD_DIST_GEOMETRIC;
   relay_machine->states[2].length_dist.param1 = 0.648578;
   //relay_machine->states[2].length_dist.param2 = ;
-  relay_machine->states[2].start_length = 1;
+  relay_machine->states[2].start_length = 2;
   //relay_machine->states[2].max_length = 10;
 
   relay_machine->states[2].iat_dist.type = CIRCPAD_DIST_LOG_LOGISTIC;
   relay_machine->states[2].iat_dist.param1 = 26.22286;
   relay_machine->states[2].iat_dist.param2 = 21.0;
   relay_machine->states[2].dist_added_shift_usec = 15;
-  relay_machine->states[2].dist_max_sample_usec = 20000;
+  relay_machine->states[2].dist_max_sample_usec = 13000;
   
   // EXTEND state tansitions: 
   relay_machine->states[2].next_state[CIRCPAD_EVENT_PADDING_SENT] = 2;

@@ -75,7 +75,6 @@ def mon_unmon_split(bursts, labels):
 
 #
 def get_burst_distfit(bursts):
-    # get bursts list
     all_bursts = np.concatenate(bursts).astype(int)
     send_burst = all_bursts[all_bursts > 0]
     recv_burst = -all_bursts[all_bursts < 0] 
@@ -97,7 +96,6 @@ def get_burst_distfit(bursts):
 
 #
 def make_burst_plot(bursts, file):
-    # get bursts list
     all_bursts = np.concatenate(bursts).astype(int)
     send_burst = all_bursts[all_bursts > 0]
     recv_burst = -all_bursts[all_bursts < 0] 
@@ -121,7 +119,6 @@ def make_burst_plot(bursts, file):
 
 # [MAIN]
 def main():
-    #
     logger = get_logger()
     logger.info(f"{MODULE_NAME}: start to run.")
     
@@ -145,7 +142,6 @@ def main():
     make_burst_plot(mon_bursts, f"mon-{args['out']}")
     make_burst_plot(unmon_bursts, f"unmon-{args['out']}")    
     logger.info(f"MAKED iat plots.")
-    sys.exit()
 
     # 4. fit data to distribution
     logger.info(f"FITTING iats to the distribution ...")
@@ -168,4 +164,5 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
 

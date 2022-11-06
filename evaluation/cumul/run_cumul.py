@@ -79,8 +79,7 @@ def generate_feature_vectors(data_file):
 
 
 def train_cumul(X_train, y_train):
-    #clf = Pipeline([('standardscaler', StandardScaler()), ('svc', SVC(kernel='rbf', C=c, gamma=int(g)))])
-    model = Pipeline([('standardscaler', StandardScaler()), ('svc', SVC(kernel='rbf'))])
+    model = Pipeline([('standardscaler', StandardScaler()), ('svc', SVC(kernel='rbf', C=2048, gamma=0.015625))])
     model.fit(X_train, y_train)
 
     return model
@@ -141,7 +140,8 @@ def get_openworld_score(y_true, y_pred, label_unmon):
 def find_optimal_hyperparams(X, y):
     #
     model = Pipeline([("standardscaler", StandardScaler()), ("svc", SVC(kernel="rbf"))])
-    hyperparams = {"svc__C":[2048, 4096, 8192, 16384, 32768, 65536, 131072], "svc__gamma":[0.125, 0.25, 0.5, 0, 2, 4, 8]}
+    #hyperparams = {"svc__C":[2048, 4096, 8192, 16384, 32768, 65536, 131072], "svc__gamma":[0.125, 0.25, 0.5, 0, 2, 4, 8]}
+    hyperparams = {"svc__C":[256, 526, 1024, 2048], "svc__gamma":[0.0078125, 0.015625, 0.03125, 0.0625]}
     
     clf = GridSearchCV(model, hyperparams, n_jobs=-1, cv=2, scoring=make_scorer(openworld_recall_score, label_unmon=max(y)))
     clf.fit(X, y)
@@ -218,11 +218,11 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=247, stratify=y)
     
     # find best hyperparameters
-    lines = find_optimal_hyperparams(X, y)
-    print(lines)
-    sys.exit(0)
+    #lines = find_optimal_hyperparams(X, y)
+    #print(lines)
+    #sys.exit(0)
     
-
+    
     # training
     model = train_cumul(X_train, y_train)
     logger.info(f"[TRAINED] cumul model.")
@@ -235,7 +235,7 @@ def main():
     lines = get_openworld_score(y_test, y_pred, max(y_test))
     logger.info(f"[CALCULATED] metrics.")
     
-    with open(join(OUTPUT_DIR, CURRENT_TIME+args["out"]+".txt"), "w") as f:
+    with open(join(OUTPUT_DIR, args["out"]+".txt"), "w") as f:
         f.writelines(lines)
         logger.info(f"[SAVED] results in the {args['out']}.")
 
@@ -245,3 +245,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+

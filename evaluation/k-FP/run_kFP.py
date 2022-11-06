@@ -164,8 +164,8 @@ def get_metrics(y_true, y_pred, label_unmon):
     f1 = 2*(precision*recall) / float(precision+recall)
 
     lines = []
-    lines.append(f"[POS] TP-c: {tp_c},  TP-i(incorrect class): {tp_i},  FN: {fn}\n")
-    lines.append(f"[NEG] TN: {tn},  FP: {fp}\n\n")
+    lines.append(f"[POS] TP-c: {tp_c}, TP-i(incorrect class): {tp_i}, FN: {fn}\n")
+    lines.append(f"[NEG] TN: {tn}, FP: {fp}\n\n")
     lines.append(f"accuracy: {accuracy}\n")
     lines.append(f"precision: {precision}\n")
     lines.append(f"recall: {recall}\n")
@@ -203,7 +203,7 @@ def main():
     lines = get_metrics(y_test, y_pred, max(y_test))
     logger.info(f"[CALCULATED] metrics.")
     
-    with open(join(OUTPUT_DIR, CURRENT_TIME+args["out"]+".txt"), "w") as f:
+    with open(join(OUTPUT_DIR, args["out"]+".txt"), "w") as f:
         f.writelines(lines)
         logger.info(f"[SAVED] results in the {args['out']}.")
 
@@ -213,4 +213,5 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
 

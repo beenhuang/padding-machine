@@ -1,1 +1,0 @@
-This directory used for saving trained DF model.

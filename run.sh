@@ -1,46 +1,33 @@
 #!/bin/bash
 
-out=1104-august-a
+simtrace=1106-august
 
-:<<!
+machinedir=1104
+machine=august
+
+outdir=1106
+
+
 # 1. run simulation
-for i in {1..5}
-do
-    echo "---------------     run simulation in $i times     ---------------"
-    ./simulation/run_simulation.py --in standard --out $out-$i --machine august
-done
+echo "---------------     run simulation     ---------------"
+./simulation/run_simulation.py --in standard --out $simtrace --machine $machine
 
+# 2. bandwidth overhead
+echo "---------------     bandwidth overhead   ---------------"
+./evaluation/overhead.py --in $simtrace-5000.pkl  --out $outdir/overhead-$simtrace
 
-# bandwidth overhead
-for i in {1..5}
-do
-    echo "---------------     bandwidth overhead in $i times   ---------------"
-    ./evaluation/overhead.py --in $out-$i-5000.pkl  --out overhead-$out-$i
-done
+# 3.1 cumul evaluation
+echo "---------------     CUMUL evaluation    ---------------"
+./evaluation/cumul/run_cumul.py --in $simtrace-5000.pkl  --out $outdir/cumul-$simtrace
 
+# 3.2 k-FP evaluation
+echo "---------------     k-FP evaluation    ---------------"
+./evaluation/k-FP/run_kFP.py --in $simtrace-5000.pkl  --out $outdir/kfp-$simtrace
 
-# 2. evaluation
-# 2.1 cumul
-for i in {1..5}
-do
-    echo "---------------     CUMUL evaluation in $i times    ---------------"
-    ./evaluation/cumul/run_cumul.py --in $out-$i-5000.pkl  --out cumul-$out-$i
-done
+# 3.3 df evaluation
+echo "---------------     df evaluation   ---------------"
+./evaluation/df/run_df.py --in $simtrace-5000.pkl  --out $outdir/df-$simtrace
 
-# 2.1 k-FP
-for i in {1..5}
-do
-    echo "---------------     k-FP evaluation in $i times    ---------------"
-    ./evaluation/k-FP/run_kFP.py --in $out-$i-5000.pkl  --out kfp-$out-$i
-done
-!
+echo "----------  all done   ----------"
 
-# 2.3 df
-for i in {1..5}
-do
-    echo "---------------     df evaluation in $i times    ---------------"
-    ./evaluation/df/run_df.py --in $out-$i-5000.pkl  --out df-$out-$i
-done
-
-echo "----------   done   ----------"
 

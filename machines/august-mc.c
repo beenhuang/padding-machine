@@ -42,6 +42,19 @@
 
   /******************  [START OF STATES]  *****************/
 
+  /* short define for sampling uniformly random [0, 1.0]  */
+  const struct uniform_t my_uniform = {
+    .base = UNIFORM(my_uniform),
+    .a = 0.0,
+    .b = 1.0,
+  };
+
+  #define CIRCPAD_UNI_RAND (dist_sample(&my_uniform.base))
+
+  /* uniformly random select a distribution parameters between [0, 10] */
+  #define CIRCPAD_RAND_DIST_PARAM1 (CIRCPAD_UNI_RAND *10) 
+  #define CIRCPAD_RAND_DIST_PARAM2 (CIRCPAD_UNI_RAND *10)
+
   /**
    * length = MIN((start_length + length_dist), max_length)
    * iat = MIN(iat_dist, dist_max_sample_usec)+dist_added_shift_usec
