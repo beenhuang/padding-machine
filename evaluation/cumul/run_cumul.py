@@ -202,7 +202,6 @@ def openworld_recall_score(y_true, y_pred, label_unmon):
 
 # [MAIN] function
 def main():
-    # 
     logger = get_logger()
     logger.info(f"{MODULE_NAME}: start to run.")
 

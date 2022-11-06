@@ -33,11 +33,15 @@ CURRENT_TIME = time.strftime("%Y.%m.%d-c%H:%M:%S", time.localtime())
 
 BASE_DIR = abspath(join(dirname(__file__), pardir, pardir))
 INPUT_DIR = join(BASE_DIR, "simulation", "sim-traces")
-OUTPUT_DIR = join(BASE_DIR, "results")
+OUTPUT_DIR = join(BASE_DIR, "results", "1104")
+CONFIG_DIR = join(BASE_DIR, "evaluation", "df")
 TRAINED_DF_DIR = join(BASE_DIR, "evaluation", "df", "model")
 
 NONPADDING_SENT = 1.0
 NONPADDING_RECV = -1.0
+
+PADDING_SENT = 2.0
+PADDING_RECV = -2.0
 
 
 #
@@ -68,12 +72,12 @@ def parse_arguments():
     args = vars(parser.parse_args())
 
     # [2] configuration parser
-    CONFIG_FILE = join(os.getcwd(), "conf.ini")
+    config_file = join(CONFIG_DIR, "conf.ini")
 
     config_parser = configparser.ConfigParser()
-    config_parser.read(CONFIG_FILE)
+    config_parser.read(config_file)
 
-    return args, config_parser
+    return args, config_parser["default"]
 
 class DFDataset(Dataset):
     def __init__(self, X, y):
@@ -95,15 +99,15 @@ def preprocess_data(file):
         dataset, y = pickle.load(f)
 
     X = []
-    for trace in dataset:
-        direct_trace = [row[1] for row in trace.tolist()]
+    for elem in dataset:
+        direct_trace = [row[1] for row in elem.tolist()]
         direct_trace = direct_trace + [0] * (5000 - len(direct_trace))
-        X.append(np.array([direct_trace[:5000]], dtype=np.float32))
+        trace = np.array([direct_trace[:5000]], dtype=np.float32)
+        trace[trace == PADDING_SENT] = NONPADDING_SENT
+        trace[trace == PADDING_RECV] = NONPADDING_RECV    
+        X.append(trace)
+    
 
-    for trace in X:
-        trace[trace > 1.0] = 1.0
-        trace[trace < -1.0] = -1.0    
-        
     return X, y     
 
 
@@ -152,7 +156,7 @@ def train_loop(dataloader, model, loss_function, optimizer, device):
         running_loss += loss.item()
     
     # print loss average:
-    print(f"[training] Avg_loss: {running_loss}/{num_batch} = {running_loss/num_batch}")        
+    print(f"[training] Avg_loss(loss/num_batch): {running_loss}/{num_batch} = {running_loss/num_batch}")        
  
 
 # dataloader : dataset=2,000 , batch_size=750, num_batch=3
@@ -167,7 +171,6 @@ def validate_loop(dataloader, model, device):
 
     # set gradient calculation to off
     with torch.no_grad():
-        #
         for X, y in dataloader:
             # dataset load to device
             X, y = X.to(device), y.to(device)
@@ -179,7 +182,51 @@ def validate_loop(dataloader, model, device):
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 
     # print accuracy:
-    print(f" [validating] Accuracy: {correct}/{ds_size} = {correct/ds_size}")
+    print(f"[validating] Accuracy: {correct}/{ds_size} = {correct/ds_size}")
+
+
+# [FUNC]: test DF model
+def test(dataloader, model, device, classes):
+    # prediction, true label
+    pred, label = [], []
+    
+    # not update batch_normalization and disable dropout layer
+    model.eval()
+
+    # set gradient calculation to off
+    with torch.no_grad():
+        # travel
+        for X, y in dataloader:
+            # dataset load to device
+            X, y = X.to(device), y.to(device)
+
+            # 1. Compute prediction:
+            prediction = model(X)
+
+            # extend softmax result to the prediction list:
+            pred.extend(F.softmax(prediction, dim=1).data.cpu().numpy().tolist())
+
+            # extend actual label to the label list:
+            label.extend(y.data.cpu().numpy().tolist())
+
+        print(f"[testing] prediction: {len(pred)}, label: {len(label)}")
+    
+    lines = get_openworld_score(label, pred, max(label))
+   
+    '''
+    threshold = np.append([0], 1.0 - 1 / np.logspace(0.05, 2, num=15, endpoint=True))
+    threshold = np.around(threshold, decimals=4)
+    lines = []
+    for th in threshold: 
+        # compute metrics
+        tp, fpp, fpn, tn, fn, accuracy, recall, precision, f1 = df_metrics(th, pred, label, classes)
+
+        lines.append(f"[METRICS] TP: [{tp}] , FP-P: [{fpp}] , FP-N: [{fpn}] , TN: [{tn}] , FN: [{fn:>5}]\n")
+        lines.append(f"[METRICS_1] threshold: [{th:4.2}], accuracy: [{accuracy:4.2}]\n")
+        lines.append(f"[METRICS_2] precision: [{precision:4.2}] , recall: [{recall:4.2}] , F1: [{f1:4.2}]\n\n")
+    '''
+
+    return lines 
 
 
 
@@ -191,11 +238,11 @@ def df_metrics(threshold, pred, label, label_unmon):
     for i in range(len(pred)):
         
         # get prediction
-        label_pred = np.argmax(pred[i])
+        label_pred = np.argmax(pred[i]) # predicted label
         
-        prob_pred = max(pred[i])
+        prob_pred = max(pred[i]) # probability
         
-        label_correct = label[i]
+        label_correct = label[i] # true label
 
         # we split on monitored or unmonitored correct label
         if label_correct != label_unmon:
@@ -235,60 +282,66 @@ def df_metrics(threshold, pred, label, label_unmon):
     
     return tp, fpp, fpn, tn, fn, accuracy, recall, precision, f1
 
-# [FUNC]: test DF model
-def test(dataloader, model, device, classes):
-    # prediction, true label
-    pred, label = [], []
-    
-    # not update batch_normalization and disable dropout layer
-    model.eval()
 
-    # set gradient calculation to off
-    with torch.no_grad():
-        # travel
-        for X, y in dataloader:
-            # dataset load to device
-            X, y = X.to(device), y.to(device)
 
-            # 1. Compute prediction:
-            prediction = model(X)
+# [FUNC] get metrics values
+def get_openworld_score(y_true, y_pred, label_unmon):
+    print(f"label_unmon: {label_unmon}")
+    # TP-correct, TP-incorrect, FN  TN, FN
+    tp_c, tp_i, fn, tn, fp = 0, 0, 0, 0, 0
 
-            # extend softmax result to the prediction list:
-            pred.extend(F.softmax(prediction, dim=1).data.cpu().numpy().tolist())
+    # traverse preditions
+    for i in range(len(y_pred)):
+        pred_label = np.argmax(y_pred[i])
 
-            # extend actual label to the label list:
-            label.extend(y.data.cpu().numpy().tolist())
+        # [case_1]: positive sample, and predict positive and correct.
+        if y_true[i] != label_unmon and pred_label != label_unmon and pred_label == y_true[i]:
+            tp_c += 1
+        # [case_2]: positive sample, predict positive but incorrect class.
+        elif y_true[i] != label_unmon and pred_label != label_unmon and pred_label != y_true[i]:
+            tp_i += 1
+        # [case_3]: positive sample, predict negative.
+        elif y_true[i] != label_unmon and pred_label == label_unmon:
+            fn += 1
+        # [case_4]: negative sample, predict negative.    
+        elif y_true[i] == label_unmon and pred_label == y_true[i]:
+            tn += 1
+        # [case_5]: negative sample, predict positive    
+        elif y_true[i] == label_unmon and pred_label != y_true[i]:
+            fp += 1   
+        else:
+            sys.exit(f"[ERROR]: {pred_label}, {y_true[i]}")        
 
-        print(f" [testing] prediction: [{len(pred)}] , label: [{len(label)}]")
-    
-    # metrics result
+    # accuracy
+    accuracy = (tp_c+tn) / float(tp_c+tp_i+fn+tn+fp)
+    # precision      
+    precision = tp_c / float(tp_c+tp_i+fp)
+    # recall
+    recall = tp_c / float(tp_c+tp_i+fn)
+    # F-score
+    f1 = 2*(precision*recall) / float(precision+recall)
+
     lines = []
-
-    threshold = np.append([0], 1.0 - 1 / np.logspace(0.05, 2, num=15, endpoint=True))
-    threshold = np.around(threshold, decimals=4)
-    
-    for th in threshold: 
-        # compute metrics
-        tp, fpp, fpn, tn, fn, accuracy, recall, precision, f1 = df_metrics(th, pred, label, classes)
-
-        lines.append(f"[METRICS] TP: [{tp}] , FP-P: [{fpp}] , FP-N: [{fpn}] , TN: [{tn}] , FN: [{fn:>5}]\n")
-        lines.append(f"[METRICS_1] threshold: [{th:4.2}], accuracy: [{accuracy:4.2}]\n")
-        lines.append(f"[METRICS_2] precision: [{precision:4.2}] , recall: [{recall:4.2}] , F1: [{f1:4.2}]\n\n")
-
-    return lines 
+    lines.append(f"[POS] TP-c: {tp_c},  TP-i(incorrect class): {tp_i},  FN: {fn}\n")
+    lines.append(f"[NEG] TN: {tn},  FP: {fp}\n\n")
+    lines.append(f"accuracy: {accuracy}\n")
+    lines.append(f"precision: {precision}\n")
+    lines.append(f"recall: {recall}\n")
+    lines.append(f"F1: {f1}\n")
+    return lines
 
 # [MAIN]
 def main():
     logger = get_logger()
-    # 
     logger.info(f"{MODULE_NAME}: start to run.")
 
     # parse commmand arguments & configuration file
     args, config = parse_arguments()
+    logger.info(f"args: {args}, config: {config}")
 
-    EPOCH = int(config["default"]["epoch"])
-    BATCH_SIZE = int(config["default"]["batch_size"])
-    CLASSES = int(config["default"]["num_mon_site"])+1  # monitored + 1(unmonitored)
+    EPOCH = int(config["epoch"])
+    BATCH_SIZE = int(config["batch_size"])
+    CLASSES = int(config["num_mon_site"])+1 # monitored + 1(unmonitored)
 
     # 1. load dataset
     X, y = preprocess_data(join(INPUT_DIR, args["in"]))
@@ -298,44 +351,41 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"device: {device}")
     
-    ############   TRAINING   ###############
-    if args["train"]:
-        #
-        logger.info(f"----- [TRAINING] start to train the DF model -----")
+############   TRAINING   ###############
 
-        # train/validating dataloader: 
-        train_dataloader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
-        valid_dataloader = DataLoader(valid_data, batch_size=BATCH_SIZE, shuffle=True)
+    logger.info(f"----- [TRAINING] start to train the DF model -----")
 
-        # create DFNet model    
-        df_net = DFNet(CLASSES).to(device)         
+    # training/validation dataloader: 
+    train_dataloader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
+    valid_dataloader = DataLoader(valid_data, batch_size=BATCH_SIZE, shuffle=True)
 
-        # loss function:
-        loss_function = nn.CrossEntropyLoss()
-        # optimizer:
-        optimizer = Adamax(params=df_net.parameters())
+    # create DFNet model    
+    df_net = DFNet(CLASSES).to(device)         
+    # loss function:
+    loss_function = nn.CrossEntropyLoss()
+    # optimizer:
+    optimizer = Adamax(params=df_net.parameters())
 
+    # training loop
+    for i in range(EPOCH):
+        logger.info(f"---------- Epoch {i+1} ----------")
 
-        # training loop
-        for i in range(EPOCH):
-            logger.info(f"---------- Epoch {i+1} ----------")
+        # train DF model
+        train_loop(train_dataloader, df_net, loss_function, optimizer, device)
+        # validate DF model
+        validate_loop(valid_dataloader, df_net, device)
 
-            # train DF model
-            train_loop(train_dataloader, df_net, loss_function, optimizer, device)
-            # validate DF model
-            validate_loop(valid_dataloader, df_net, device)
+    logger.info(f"----- [TRAINING] Completed -----")
 
-        logger.info(f"----- [TRAINING] Completed -----")
+    # save trained DF model
+    #torch.save(df_net, join(TRAINED_DF_DIR, args["model"]))
+    #logger.info(f"[SAVED] the trained DF model to the {args['model']}")
 
-        # save trained DF model
-        torch.save(df_net, join(TRAINED_DF_DIR, args["model"]))
-        logger.info(f"[SAVED] the trained DF model to the {args['model']}")
+    # load trained DF model
+    #df_net = torch.load(join(TRAINED_DF_DIR, args["model"])).to(device)
+    #logger.info(f"[LOADED] the trained DF model, file-name: {args['model']}")
 
-    else: # load trained DF model
-        df_net = torch.load(join(TRAINED_DF_DIR, args["model"])).to(device)
-        logger.info(f"[LOADED] the trained DF model, file-name: {args['model']}")
-
-    ############   TESTING   ################# 
+############   TESTING   ################# 
     logger.info(f"----- [TESTING] start to test the DF model -----")
 
     # test dataloader:
