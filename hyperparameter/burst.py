@@ -28,13 +28,16 @@ BASE_DIR = abspath(join(dirname(__file__), pardir))
 INPUT_DIR = join(BASE_DIR, "simulation", "sim-traces")
 OUTPUT_DIR = join(BASE_DIR, "hyperparameter", "fit-results", "burst")
 
-DIRECTION_OUT = 1.0
-DIERCTION_IN = -1.0
+NONPADDING_SENT = 1.0
+NONPADDING_RECV = -1.0
+
+PADDING_SENT = 2.0
+PADDING_RECV = -2.0
 
 
 #
 def get_logger():
-    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO)
+    logging.basicConfig(format="[%(asctime)s]>>> %(message)s", level=logging.INFO, datefmt = "%Y-%m-%d %H:%M:%S")
     logger = logging.getLogger(splitext(basename(__file__))[0])
     
     return logger
@@ -55,7 +58,15 @@ def parse_arguments():
 
 
 def get_burst_trace(trace):
-    return [sum(list(group)) for _,group in itertools.groupby(trace[:,1])]
+    trace = trace[:,1]
+    print(f"trace: {trace}")
+    trace[trace == PADDING_SENT] = NONPADDING_SENT
+    trace[trace == PADDING_RECV] = NONPADDING_RECV   
+    print(f"new_trace: {trace}")
+
+    return [sum(list(group)) for _,group in itertools.groupby(trace)]
+
+    #return [sum(list(group)) for _,group in itertools.groupby(trace[:,1])]
 
 
 def transform_to_burst_trace(dataset):
@@ -72,27 +83,6 @@ def mon_unmon_split(bursts, labels):
     unmon_bursts = bursts[unmon_index:]
 
     return mon_bursts, unmon_bursts                 
-
-#
-def get_burst_distfit(bursts):
-    all_bursts = np.concatenate(bursts).astype(int)
-    send_burst = all_bursts[all_bursts > 0]
-    recv_burst = -all_bursts[all_bursts < 0] 
-    
-    todo = [[send_burst, "uniform"], [send_burst, "logistic"],
-            [send_burst, "fisk"], [send_burst, "geom"],
-            [send_burst, "weibull"],[send_burst, "pareto"],
-            [recv_burst, "uniform"], [recv_burst, "logistic"],
-            [recv_burst, "fisk"],[recv_burst, "geom"],
-            [recv_burst, "weibull"],[recv_burst, "pareto"]]
-
-    with mp.Pool(mp.cpu_count()) as pool:
-        results = pool.starmap(fit_data_to_dist, todo)
-        
-    results.insert(0, "\n-----  send_burst  -----\n")
-    results.insert(7, "\n-----  recv_burst  -----\n")
-
-    return results
 
 #
 def make_burst_plot(bursts, file):
@@ -117,6 +107,34 @@ def make_burst_plot(bursts, file):
         save_bar_plot(unique_recv[:max_index], count_recv[:max_index], join(OUTPUT_DIR, f"{CURRENT_TIME}_recv-{max_index}-{file}.png"), "RECV BURST", "recv burst", "count")     
 
 
+#
+def get_burst_distfit(bursts):
+    all_bursts = np.concatenate(bursts).astype(int)
+    send_burst = all_bursts[all_bursts > 0]
+    recv_burst = -all_bursts[all_bursts < 0] 
+    
+    recv_max = 5
+    #recv_burst = recv_burst[recv_burst > 9]
+    recv_burst = recv_burst[recv_burst < recv_max]
+    
+    send_max = 22
+    send_burst = send_burst[send_burst < send_max]
+    
+    todo = [[send_burst, "uniform"], [send_burst, "logistic"],
+            [send_burst, "fisk"], [send_burst, "geom"],
+            [send_burst, "weibull"],[send_burst, "pareto"],
+            [recv_burst, "uniform"], [recv_burst, "logistic"],
+            [recv_burst, "fisk"],[recv_burst, "geom"],
+            [recv_burst, "weibull"],[recv_burst, "pareto"]]
+
+    with mp.Pool(mp.cpu_count()) as pool:
+        results = pool.starmap(fit_data_to_dist, todo)
+        
+    results.insert(0, "\n-----  send_burst  -----\n")
+    results.insert(7, "\n-----  recv_burst  -----\n")
+
+    return results
+    
 # [MAIN]
 def main():
     logger = get_logger()
@@ -137,14 +155,14 @@ def main():
     
 
     # 3. save burst plot
-    logger.info(f"MAKING iat plots ...")
-    make_burst_plot(bursts, f"all-{args['out']}")
-    make_burst_plot(mon_bursts, f"mon-{args['out']}")
-    make_burst_plot(unmon_bursts, f"unmon-{args['out']}")    
-    logger.info(f"MAKED iat plots.")
+    #logger.info(f"MAKING burst plots ...")
+    #make_burst_plot(bursts, f"all-{args['out']}")
+    #make_burst_plot(mon_bursts, f"mon-{args['out']}")
+    #make_burst_plot(unmon_bursts, f"unmon-{args['out']}")    
+    #logger.info(f"MAKED burst plots.")
 
     # 4. fit data to distribution
-    logger.info(f"FITTING iats to the distribution ...")
+    logger.info(f"FITTING burst to the distribution ...")
     dist_total = get_burst_distfit(bursts)
     dist_mon = get_burst_distfit(mon_bursts)
     dist_unmon = get_burst_distfit(unmon_bursts)
@@ -164,5 +182,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
 

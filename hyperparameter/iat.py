@@ -32,7 +32,7 @@ DIERCTION_IN = -1.0
 
 # 
 def get_logger():
-    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO)
+    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO, datefmt = "%Y-%m-%d %H:%M:%S")
     logger = logging.getLogger(splitext(basename(__file__))[0])
     
     return logger
@@ -137,7 +137,13 @@ def fit_iat_to_dist(iats):
         #r2s.extend(elem[2])
 
     s2s = np.array(s2s, dtype=np.int32)
-    r2r = np.array(r2r, dtype=np.int32)    
+    r2r = np.array(r2r, dtype=np.int32)
+
+    s2s_max = 30
+    s2s = s2s[s2s < s2s_max]
+    
+    r2r_max = 28
+    r2r = r2r[r2r < r2r_max]    
 
     todo = [[s2s, "uniform"], [s2s, "logistic"],
             [s2s, "fisk"], [s2s, "geom"],
@@ -173,11 +179,11 @@ def main():
     logger.info(f"TRANSFORMED iat_trace, total_length:{len(iats)}, mon_length:{len(mon_iats)}, unmon_length:{len(unmon_iats)}")
 
     # 3. 
-    logger.info(f"MAKING iat plots ...")
-    make_iat_plot(iats, "all-"+args["out"]) 
-    make_iat_plot(mon_iats, "mon-"+args["out"])
-    make_iat_plot(unmon_iats, "unmon-"+args["out"])  
-    logger.info(f"MAKED iat plots.")
+    #logger.info(f"MAKING iat plots ...")
+    #make_iat_plot(iats, "all-"+args["out"]) 
+    #make_iat_plot(mon_iats, "mon-"+args["out"])
+    #make_iat_plot(unmon_iats, "unmon-"+args["out"])  
+    #logger.info(f"MAKED iat plots.")
 
     # 4. fit iat to distribution
     logger.info(f"FITTING iats to the distribution ...")
@@ -200,5 +206,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
 
