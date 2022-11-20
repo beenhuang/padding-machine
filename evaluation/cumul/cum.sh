@@ -1,11 +1,17 @@
 #!/bin/bash
 
-# all parameters of CUMUL model :
-#./run_cumul.py --in <input_dir> --out <metrics>
+# all parameters of CUMUL model:
+#./run_cumul.py --in <input_file> --out <result>
+
+infile=2022.10.23-15:30:47_august-5000.pkl
+outfile=cumul-august
+
+echo "---------------     CUMUL evaluation    ---------------"
+./evaluation/cumul/run_cumul.py --in $infile  --out $outfile
 
 
 :<<!
-# evaluate the august machine using k-FP classifier
+# evaluate the august machine using CUMUL classifier
 for pkl in 2022.10.23-15:30:47_august-5000.pkl  2022.10.23-15:42:58_august-5000.pkl 2022.10.23-15:55:11_august-5000.pkl 2022.10.23-16:07:26_august-5000.pkl 2022.10.23-16:19:36_august-5000.pkl
 do
     echo "---------------     RUN  AUGUST     ---------------"
@@ -14,7 +20,7 @@ done
 !
 
 
-# evaluate the interspace machine using k-FP classifier
+# evaluate the interspace machine using CUMUL classifier
 for pkl in 2022.10.22-13:19:21_interspace-5000.pkl          2022.10.22-13:26:20_interspace-5000.pkl    2022.10.22-13:33:15_interspace-5000.pkl    2022.10.22-13:40:07_interspace-5000.pkl   2022.10.22-13:46:58_interspace-5000.pkl  
 do
     echo "---------------     RUN  INTERSPACE     ---------------"
@@ -32,7 +38,7 @@ done
 !
 
 :<<!
-# evaluate original traces using k-FP classifier without any padding machines.
+# evaluate original traces using CUMUL classifier without any padding machines.
 for pkl in 2022.10.23-09:55:05_original-5000.pkl 2022.10.23-09:57:21_original-5000.pkl 2022.10.23-09:59:38_original-5000.pkl 2022.10.23-10:01:55_original-5000.pkl 2022.10.23-10:04:12_original-5000.pkl  
 do
     echo "---------------     RUN  ORIGINAL     ---------------"
