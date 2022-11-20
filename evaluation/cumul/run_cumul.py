@@ -49,7 +49,7 @@ def get_logger():
 # [FUNC] parse arugment
 def parse_arguments():
     # argument parser
-    parser = argparse.ArgumentParser(description="k-FP")
+    parser = argparse.ArgumentParser(description="CUMUL")
 
     # 1. INPUT: load ds-*.pkl dataset
     parser.add_argument("-i", "--in", required=True, metavar="<trace file directory>", help="load trace data")
@@ -79,7 +79,7 @@ def generate_feature_vectors(data_file):
 
 
 def train_cumul(X_train, y_train):
-    model = Pipeline([('standardscaler', StandardScaler()), ('svc', SVC(kernel='rbf', C=2048, gamma=0.015625))])
+    model = Pipeline([("standardscaler", StandardScaler()), ("svc", SVC(kernel="rbf", C=2048, gamma=0.015625))])
     model.fit(X_train, y_train)
 
     return model
@@ -131,6 +131,7 @@ def get_openworld_score(y_true, y_pred, label_unmon):
     lines.append(f"precision: {precision}\n")
     lines.append(f"recall: {recall}\n")
     lines.append(f"F1: {f1}\n")
+    
     return lines
 
 

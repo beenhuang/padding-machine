@@ -1,8 +1,8 @@
 #!usr/bin/env python3
 
 """
-<file>    feature.py
-<brief>   extract CUMUL features from the trace
+<file>    exfeature.py
+<brief>   extract the CUMUL feature from the trace data
 """
 
 import numpy as np
@@ -13,9 +13,9 @@ from os.path import abspath, dirname, join
 def get_general_trace(trace):
     #
     gen_total = []
-    trace = trace[:,1].tolist()
+    direction_trace = trace[:,1].tolist()
     
-    for packet in trace:
+    for packet in direction_trace:
         gen_total.append(int(packet)*514)
 
     return gen_total
@@ -29,7 +29,7 @@ def transform_general_inout_trace(trace):
 
     return gen_in, gen_out 
 
-
+# max_length = 100
 def extract_features(trace, maxlength):
     if maxlength % 2 != 0 :
         sys.exit(f"[ERROR] feature_size is invalid.")
@@ -43,8 +43,8 @@ def extract_features(trace, maxlength):
 
     # travel trace
     for packet in gen_total:
-        #
-        if len(cumul_total) == 0: # first element
+        # first element
+        if len(cumul_total) == 0: 
             cumul_total.append(packet)
             abs_total.append(packet)
         else:
@@ -55,7 +55,7 @@ def extract_features(trace, maxlength):
     cumul_feature = np.interp(np.linspace(abs_total[0], abs_total[-1], maxlength+1), abs_total, cumul_total) 
 
 
-    # num of in/out trace, packer_size of in/out trace
+    # num of in/out trace, packet_size of in/out trace
     all_features.append(len(gen_in)) 
     all_features.append(len(gen_out)) 
     all_features.append(abs(np.sum(gen_out)))
