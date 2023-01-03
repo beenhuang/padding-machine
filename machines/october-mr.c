@@ -1,14 +1,14 @@
 //REPLACE-relay-padding-machine-REPLACE
 
 /**
- * august-mr: the RELAY-side circuit padding machine on the general circuit.
+ * october-mr: the RELAY-side circuit padding machine on the general circuit.
  */  
 
   /* [ALLOCATE] : allocate memory for a relay machine */
   circpad_machine_spec_t *relay_machine = tor_malloc_zero(sizeof(circpad_machine_spec_t));
 
   /* [NAME] : relay machine name */
-  relay_machine->name = "august_relay";
+  relay_machine->name = "october_relay";
 
   /* [SIDE] : This is a relay-side machine */
   relay_machine->is_origin_side = 0;
@@ -40,7 +40,8 @@
 
   /* machine has following states:
    *  0. [START]: start state.
-   *  1. [WAIT]: do nothing
+   *  1. [WAIT]: transite to extend, fake or break.
+   *  2. [BREAK]: break burst.
    */  
 
   /**
@@ -53,15 +54,39 @@
    */ 
   
   /* [STATE INIT] : */
-  circpad_machine_states_init(relay_machine, 2);
+  circpad_machine_states_init(relay_machine, 3);
 
   /* 0. [START] state: transite to the WAIT state when relay received a NEGOTIATION cell. */
   relay_machine->states[0].next_state[CIRCPAD_EVENT_NONPADDING_RECV] = 1;
 
-  /* 1. [WAIT] state: do nothing. */
-  relay_machine->states[1].next_state[CIRCPAD_EVENT_NONPADDING_SENT] = 1;
-  relay_machine->states[1].next_state[CIRCPAD_EVENT_PADDING_RECV] = 1;
-  relay_machine->states[1].next_state[CIRCPAD_EVENT_NONPADDING_RECV] = 1;
+  /* 1. [WAIT] state: transite to EXTEND or FAKE states. */
+  //relay_machine->states[1].next_state[CIRCPAD_EVENT_NONPADDING_SENT] = 1;
+  //relay_machine->states[1].next_state[CIRCPAD_EVENT_PADDING_RECV] = 1;
+  relay_machine->states[1].next_state[CIRCPAD_EVENT_NONPADDING_RECV] = 2;
+
+  /* 2. [BREAKBURST] state: */
+  // 2.1 [RECV]: max cells received continuously
+  relay_machine->states[2].contin_recv_length_dist.type = CIRCPAD_DIST_WEIBULL;
+  relay_machine->states[2].contin_recv_length_dist.param1 = 1.2000831556068547;
+  relay_machine->states[2].contin_recv_length_dist.param2 = 2.2422487061997214;
+  //relay_machine->states[2].contin_recv_start_length = 1;
+  //relay_machine->states[2].contin_recv_max_length = 30;
+
+  // 2.2 [SEND]: max padding cells sent continuously 
+  relay_machine->states[2].contin_padding_sent_length_dist.type =  CIRCPAD_DIST_GEOMETRIC;
+  relay_machine->states[2].contin_padding_sent_length_dist.param1 = 0.45065787761465753;
+  //relay_machine->states[2].contin_padding_sent_length_dist.param2 = 0.023510946115248847;
+  //relay_machine->states[2].contin_padding_sent_start_length = 2;
+  //relay_machine->states[2].contin_padding_sent_max_length = 5;
+
+  // includes padding cell received
+  relay_machine->states[2].contin_includes_padding_recv = 1;
+
+  // 2.3 [BREAKBURST] state transition.
+  relay_machine->states[2].next_state[CIRCPAD_EVENT_PADDING_SENT] = 2;
+  relay_machine->states[2].next_state[CIRCPAD_EVENT_NONPADDING_RECV] = 2;
+  relay_machine->states[2].next_state[CIRCPAD_EVENT_PADDING_RECV] = 2;
+  relay_machine->states[2].next_state[CIRCPAD_EVENT_NONPADDING_SENT] = 1;  
 
 
 /*****************************  [END OF STATES]  *****************************/

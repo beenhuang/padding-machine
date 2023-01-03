@@ -1,0 +1,150 @@
+total trace: 20,000 
+
+sent_nonpadding: 8,375,623 , sent_padding: 0 
+recv_nonpadding: 73,170,818 , recv_padding: 0 
+
+sent cells: 8,375,623 , sent/(sent+recv)= 10% 
+recv cells: 73,170,818 , recv/(sent+recv)= 90% 
+total cells: 81,546,441 
+
+Avg sent bandwidth: sent/sent_nonpadding= 100% 
+Avg recv bandwidth: recv/recv_nonpadding= 100% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 100%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 8,375,623 , sent_padding: 0 
+recv_nonpadding: 73,170,818 , recv_padding: 0 
+
+sent cells: 8,375,623 , sent/(sent+recv)= 10% 
+recv cells: 73,170,818 , recv/(sent+recv)= 90% 
+total cells: 81,546,441 
+
+Avg sent bandwidth: sent/sent_nonpadding= 100% 
+Avg recv bandwidth: recv/recv_nonpadding= 100% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 100%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 8,375,623 , sent_padding: 0 
+recv_nonpadding: 73,170,818 , recv_padding: 0 
+
+sent cells: 8,375,623 , sent/(sent+recv)= 10% 
+recv cells: 73,170,818 , recv/(sent+recv)= 90% 
+total cells: 81,546,441 
+
+Avg sent bandwidth: sent/sent_nonpadding= 100% 
+Avg recv bandwidth: recv/recv_nonpadding= 100% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 100%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 8,375,623 , sent_padding: 0 
+recv_nonpadding: 73,170,818 , recv_padding: 0 
+
+sent cells: 8,375,623 , sent/(sent+recv)= 10% 
+recv cells: 73,170,818 , recv/(sent+recv)= 90% 
+total cells: 81,546,441 
+
+Avg sent bandwidth: sent/sent_nonpadding= 100% 
+Avg recv bandwidth: recv/recv_nonpadding= 100% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 100%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 8,375,623 , sent_padding: 0 
+recv_nonpadding: 73,170,818 , recv_padding: 0 
+
+sent cells: 8,375,623 , sent/(sent+recv)= 10% 
+recv cells: 73,170,818 , recv/(sent+recv)= 90% 
+total cells: 81,546,441 
+
+Avg sent bandwidth: sent/sent_nonpadding= 100% 
+Avg recv bandwidth: recv/recv_nonpadding= 100% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 100%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 8,375,623 , sent_padding: 0 
+recv_nonpadding: 73,170,818 , recv_padding: 0 
+
+sent cells: 8,375,623 , sent/(sent+recv)= 10% 
+recv cells: 73,170,818 , recv/(sent+recv)= 90% 
+total cells: 81,546,441 
+
+Avg sent bandwidth: sent/sent_nonpadding= 100% 
+Avg recv bandwidth: recv/recv_nonpadding= 100% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 100%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 8,375,623 , sent_padding: 0 
+recv_nonpadding: 73,170,818 , recv_padding: 0 
+
+sent cells: 8,375,623 , sent/(sent+recv)= 10% 
+recv cells: 73,170,818 , recv/(sent+recv)= 90% 
+total cells: 81,546,441 
+
+Avg sent bandwidth: sent/sent_nonpadding= 100% 
+Avg recv bandwidth: recv/recv_nonpadding= 100% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 100%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 8,375,623 , sent_padding: 0 
+recv_nonpadding: 73,170,818 , recv_padding: 0 
+
+sent cells: 8,375,623 , sent/(sent+recv)= 10% 
+recv cells: 73,170,818 , recv/(sent+recv)= 90% 
+total cells: 81,546,441 
+
+Avg sent bandwidth: sent/sent_nonpadding= 100% 
+Avg recv bandwidth: recv/recv_nonpadding= 100% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 100%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 8,375,623 , sent_padding: 0 
+recv_nonpadding: 73,170,818 , recv_padding: 0 
+
+sent cells: 8,375,623 , sent/(sent+recv)= 10% 
+recv cells: 73,170,818 , recv/(sent+recv)= 90% 
+total cells: 81,546,441 
+
+Avg sent bandwidth: sent/sent_nonpadding= 100% 
+Avg recv bandwidth: recv/recv_nonpadding= 100% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 100%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 8,375,623 , sent_padding: 0 
+recv_nonpadding: 73,170,818 , recv_padding: 0 
+
+sent cells: 8,375,623 , sent/(sent+recv)= 10% 
+recv cells: 73,170,818 , recv/(sent+recv)= 90% 
+total cells: 81,546,441 
+
+Avg sent bandwidth: sent/sent_nonpadding= 100% 
+Avg recv bandwidth: recv/recv_nonpadding= 100% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 100%
+
+

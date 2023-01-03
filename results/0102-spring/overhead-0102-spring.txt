@@ -1,0 +1,150 @@
+total trace: 20,000 
+
+sent_nonpadding: 3,059,503 , sent_padding: 9,926,155 
+recv_nonpadding: 26,743,580 , recv_padding: 26,782,506 
+
+sent cells: 12,985,658 , sent/(sent+recv)= 20% 
+recv cells: 53,526,086 , recv/(sent+recv)= 80% 
+total cells: 66,511,744 
+
+Avg sent bandwidth: sent/sent_nonpadding= 424% 
+Avg recv bandwidth: recv/recv_nonpadding= 200% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 223%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 3,058,903 , sent_padding: 9,911,705 
+recv_nonpadding: 26,734,458 , recv_padding: 26,784,517 
+
+sent cells: 12,970,608 , sent/(sent+recv)= 20% 
+recv cells: 53,518,975 , recv/(sent+recv)= 80% 
+total cells: 66,489,583 
+
+Avg sent bandwidth: sent/sent_nonpadding= 424% 
+Avg recv bandwidth: recv/recv_nonpadding= 200% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 223%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 3,057,461 , sent_padding: 9,935,704 
+recv_nonpadding: 26,739,060 , recv_padding: 26,779,149 
+
+sent cells: 12,993,165 , sent/(sent+recv)= 20% 
+recv cells: 53,518,209 , recv/(sent+recv)= 80% 
+total cells: 66,511,374 
+
+Avg sent bandwidth: sent/sent_nonpadding= 425% 
+Avg recv bandwidth: recv/recv_nonpadding= 200% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 223%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 3,061,539 , sent_padding: 9,907,347 
+recv_nonpadding: 26,766,825 , recv_padding: 26,738,931 
+
+sent cells: 12,968,886 , sent/(sent+recv)= 20% 
+recv cells: 53,505,756 , recv/(sent+recv)= 80% 
+total cells: 66,474,642 
+
+Avg sent bandwidth: sent/sent_nonpadding= 424% 
+Avg recv bandwidth: recv/recv_nonpadding= 200% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 223%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 3,060,872 , sent_padding: 9,926,018 
+recv_nonpadding: 26,766,330 , recv_padding: 26,746,482 
+
+sent cells: 12,986,890 , sent/(sent+recv)= 20% 
+recv cells: 53,512,812 , recv/(sent+recv)= 80% 
+total cells: 66,499,702 
+
+Avg sent bandwidth: sent/sent_nonpadding= 424% 
+Avg recv bandwidth: recv/recv_nonpadding= 200% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 223%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 3,059,939 , sent_padding: 9,935,017 
+recv_nonpadding: 26,733,130 , recv_padding: 26,786,850 
+
+sent cells: 12,994,956 , sent/(sent+recv)= 20% 
+recv cells: 53,519,980 , recv/(sent+recv)= 80% 
+total cells: 66,514,936 
+
+Avg sent bandwidth: sent/sent_nonpadding= 425% 
+Avg recv bandwidth: recv/recv_nonpadding= 200% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 223%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 3,059,038 , sent_padding: 9,912,956 
+recv_nonpadding: 26,757,675 , recv_padding: 26,761,246 
+
+sent cells: 12,971,994 , sent/(sent+recv)= 20% 
+recv cells: 53,518,921 , recv/(sent+recv)= 80% 
+total cells: 66,490,915 
+
+Avg sent bandwidth: sent/sent_nonpadding= 424% 
+Avg recv bandwidth: recv/recv_nonpadding= 200% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 223%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 3,059,373 , sent_padding: 9,903,561 
+recv_nonpadding: 26,747,153 , recv_padding: 26,773,992 
+
+sent cells: 12,962,934 , sent/(sent+recv)= 19% 
+recv cells: 53,521,145 , recv/(sent+recv)= 81% 
+total cells: 66,484,079 
+
+Avg sent bandwidth: sent/sent_nonpadding= 424% 
+Avg recv bandwidth: recv/recv_nonpadding= 200% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 223%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 3,058,819 , sent_padding: 9,896,978 
+recv_nonpadding: 26,750,170 , recv_padding: 26,771,287 
+
+sent cells: 12,955,797 , sent/(sent+recv)= 19% 
+recv cells: 53,521,457 , recv/(sent+recv)= 81% 
+total cells: 66,477,254 
+
+Avg sent bandwidth: sent/sent_nonpadding= 424% 
+Avg recv bandwidth: recv/recv_nonpadding= 200% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 223%
+
+
+total trace: 20,000 
+
+sent_nonpadding: 3,059,899 , sent_padding: 9,903,992 
+recv_nonpadding: 26,759,946 , recv_padding: 26,739,164 
+
+sent cells: 12,963,891 , sent/(sent+recv)= 20% 
+recv cells: 53,499,110 , recv/(sent+recv)= 80% 
+total cells: 66,463,001 
+
+Avg sent bandwidth: sent/sent_nonpadding= 424% 
+Avg recv bandwidth: recv/recv_nonpadding= 200% 
+
+Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= 223%
+
+

@@ -1,7 +1,7 @@
 //REPLACE-client-padding-machine-REPLACE
 
 /**
- * august-mc: CLIENT-side circuit padding machine on the general circuit.
+ * august CLIENT-side circuit padding machine on the general circuit.
  */  
 
   /* [ALLOCATE] : allocate memory for a client machine */
@@ -35,6 +35,7 @@
   /* [APPLY/KEEP CIRCUIT_PURPOSE] : */
   client_machine->conditions.apply_purpose_mask = CIRCPAD_PURPOSE_ALL;
   // client_machine->conditions.keep_purpose_mask = CIRCPAD_PURPOSE_ALL;
+
   
 
   /* [ABSOLUTE LIMIT] : We can only allow up to 64k of padding cells */
@@ -52,8 +53,8 @@
 
   /* machine has following states:
    *  0. [START]: start state.
-   *  1. [WAIT]: transite to break.
-   *  2. [BREAK]: break server-response burst.
+   *  1. [WAIT]: transite to extend, fake or break.
+   *  2. [BREAK]: break burst, break server-response burst.
    */
 
   /**
@@ -73,19 +74,20 @@
 
   /* 1. [WAIT] state: transite to EXTEND/FAKE/BREAK states. */
   //client_machine->states[1].next_state[CIRCPAD_EVENT_NONPADDING_SENT] = 1;
+  //client_machine->states[1].next_state[CIRCPAD_EVENT_PADDING_RECV] = 2;
   client_machine->states[1].next_state[CIRCPAD_EVENT_NONPADDING_RECV] = 2;
 
   /* 2. [BREAKBURST] state: */
   // 2.1 [RECV]: max cells received continuously
   client_machine->states[2].contin_recv_length_dist.type = CIRCPAD_DIST_WEIBULL;
-  client_machine->states[2].contin_recv_length_dist.param1 = 1.7040375147180462;
-  client_machine->states[2].contin_recv_length_dist.param2 = 5.354952111812544;
+  client_machine->states[2].contin_recv_length_dist.param1 = 1.3851158160516734;
+  client_machine->states[2].contin_recv_length_dist.param2 = 8.78773833722796;
   //client_machine->states[2].contin_recv_start_length = 1;
   //client_machine->states[2].contin_recv_max_length = 30;
 
   // 2.2 [SEND]: max padding cells sent continuously 
   client_machine->states[2].contin_padding_sent_length_dist.type =  CIRCPAD_DIST_GEOMETRIC;
-  client_machine->states[2].contin_padding_sent_length_dist.param1 = 0.4872062169684204;
+  client_machine->states[2].contin_padding_sent_length_dist.param1 = 0.48088476423682447;
   //client_machine->states[2].contin_padding_sent_length_dist.param2 = 0.023510946115248847;
   //client_machine->states[2].contin_padding_sent_start_length = 2;
   //client_machine->states[2].contin_padding_sent_max_length = 5;
@@ -95,8 +97,8 @@
 
   // 2.3 [BREAKBURST] state transition.
   client_machine->states[2].next_state[CIRCPAD_EVENT_PADDING_SENT] = 2;
+  client_machine->states[2].next_state[CIRCPAD_EVENT_PADDING_RECV] = 2;
   client_machine->states[2].next_state[CIRCPAD_EVENT_NONPADDING_RECV] = 2;
-  //client_machine->states[2].next_state[CIRCPAD_EVENT_PADDING_RECV] = 2;
   client_machine->states[2].next_state[CIRCPAD_EVENT_NONPADDING_SENT] = 1;
 
 /*****************************  [END OF STATES]  *****************************/

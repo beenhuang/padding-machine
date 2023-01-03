@@ -1,0 +1,90 @@
+[POS] TP-c: 123,  TP-i(incorrect class): 641,  FN: 1236
+[NEG] TN: 1342,  FP: 658
+
+accuracy: 0.36625
+precision: 0.08649789029535865
+recall: 0.0615
+F1: 0.07188778492109878
+
+
+[POS] TP-c: 112,  TP-i(incorrect class): 638,  FN: 1250
+[NEG] TN: 1342,  FP: 658
+
+accuracy: 0.3635
+precision: 0.07954545454545454
+recall: 0.056
+F1: 0.06572769953051644
+
+
+[POS] TP-c: 138,  TP-i(incorrect class): 644,  FN: 1218
+[NEG] TN: 1305,  FP: 695
+
+accuracy: 0.36075
+precision: 0.09343263371699391
+recall: 0.069
+F1: 0.07937877480586714
+
+
+[POS] TP-c: 119,  TP-i(incorrect class): 626,  FN: 1255
+[NEG] TN: 1346,  FP: 654
+
+accuracy: 0.36625
+precision: 0.08506075768406005
+recall: 0.0595
+F1: 0.07002059429243895
+
+
+[POS] TP-c: 130,  TP-i(incorrect class): 607,  FN: 1263
+[NEG] TN: 1343,  FP: 657
+
+accuracy: 0.36825
+precision: 0.09325681492109039
+recall: 0.065
+F1: 0.07660577489687685
+
+
+[POS] TP-c: 103,  TP-i(incorrect class): 643,  FN: 1254
+[NEG] TN: 1372,  FP: 628
+
+accuracy: 0.36875
+precision: 0.07496360989810771
+recall: 0.0515
+F1: 0.06105512744516894
+
+
+[POS] TP-c: 152,  TP-i(incorrect class): 626,  FN: 1222
+[NEG] TN: 1343,  FP: 657
+
+accuracy: 0.37375
+precision: 0.1059233449477352
+recall: 0.076
+F1: 0.08850072780203784
+
+
+[POS] TP-c: 110,  TP-i(incorrect class): 628,  FN: 1262
+[NEG] TN: 1371,  FP: 629
+
+accuracy: 0.37025
+precision: 0.08046817849305048
+recall: 0.055
+F1: 0.06534006534006533
+
+
+[POS] TP-c: 118,  TP-i(incorrect class): 590,  FN: 1292
+[NEG] TN: 1398,  FP: 602
+
+accuracy: 0.379
+precision: 0.0900763358778626
+recall: 0.059
+F1: 0.07129909365558912
+
+
+[POS] TP-c: 148,  TP-i(incorrect class): 598,  FN: 1254
+[NEG] TN: 1308,  FP: 692
+
+accuracy: 0.364
+precision: 0.10292072322670376
+recall: 0.074
+F1: 0.08609656777196042
+
+
