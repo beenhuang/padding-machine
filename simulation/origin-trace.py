@@ -32,7 +32,7 @@ NONPADDING_RECV = -1.0
 
 
 def get_logger():
-    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO)
+    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO, datefmt = "%Y-%m-%d %H:%M:%S")
     logger = logging.getLogger(splitext(basename(__file__))[0])
     
     return logger
@@ -153,7 +153,7 @@ def main():
         y.append(labels[ID])
         
     # 3. save original dataset&labels  
-    output_file = join(OUTPUT_DIR, CURRENT_TIME+args["out"]+"-"+str(args["maxlength"])+".pkl")
+    output_file = join(OUTPUT_DIR, args["out"]+"-"+str(args["maxlength"])+".pkl")
     with open(output_file, "wb") as f:
         pickle.dump((X, y), f)
         logger.info(f"[SAVED] original dataset,labels to the {args['out']+'.pkl'} file") 
@@ -164,4 +164,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
