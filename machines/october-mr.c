@@ -1,7 +1,7 @@
 //REPLACE-relay-padding-machine-REPLACE
 
 /**
- * october-mr: the RELAY-side circuit padding machine on the general circuit.
+ * october the RELAY-side circuit padding machine on the general circuit.
  */  
 
   /* [ALLOCATE] : allocate memory for a relay machine */
@@ -67,15 +67,15 @@
   /* 2. [BREAKBURST] state: */
   // 2.1 [RECV]: max cells received continuously
   relay_machine->states[2].contin_recv_length_dist.type = CIRCPAD_DIST_WEIBULL;
-  relay_machine->states[2].contin_recv_length_dist.param1 = 1.2000831556068547;
-  relay_machine->states[2].contin_recv_length_dist.param2 = 2.2422487061997214;
+  relay_machine->states[2].contin_recv_length_dist.param1 = 1.1939537311219628;
+  relay_machine->states[2].contin_recv_length_dist.param2 = 2.2388583813756533;
   //relay_machine->states[2].contin_recv_start_length = 1;
   //relay_machine->states[2].contin_recv_max_length = 30;
 
   // 2.2 [SEND]: max padding cells sent continuously 
-  relay_machine->states[2].contin_padding_sent_length_dist.type =  CIRCPAD_DIST_GEOMETRIC;
-  relay_machine->states[2].contin_padding_sent_length_dist.param1 = 0.45065787761465753;
-  //relay_machine->states[2].contin_padding_sent_length_dist.param2 = 0.023510946115248847;
+  relay_machine->states[2].contin_padding_sent_length_dist.type =  CIRCPAD_DIST_PARETO;
+  relay_machine->states[2].contin_padding_sent_length_dist.param1 = 7.009539453953314;
+  relay_machine->states[2].contin_padding_sent_length_dist.param2 = -1.7523848634883286;
   //relay_machine->states[2].contin_padding_sent_start_length = 2;
   //relay_machine->states[2].contin_padding_sent_max_length = 5;
 
@@ -98,5 +98,5 @@
   circpad_register_padding_machine(relay_machine, relay_padding_machines);
 
   /* [LOGGING] : */
-  log_info(LD_CIRC, "[AUGUST_RELAY] Registered the AUGUST relay padding machine (%u)", relay_machine->machine_num);
+  log_info(LD_CIRC, "[OCTOBER_RELAY] Registered the OCTOBER relay padding machine (%u)", relay_machine->machine_num);
 

@@ -1,14 +1,14 @@
 //REPLACE-client-padding-machine-REPLACE
 
 /**
- * august CLIENT-side circuit padding machine on the general circuit.
+ * october CLIENT-side circuit padding machine on the general circuit.
  */  
 
   /* [ALLOCATE] : allocate memory for a client machine */
   circpad_machine_spec_t *client_machine = tor_malloc_zero(sizeof(circpad_machine_spec_t));
 
   /* [NAME] : client machine name */
-  client_machine->name = "august_client";
+  client_machine->name = "october_client";
 
   /* [SIDE] : This is a client-side machine */
   client_machine->is_origin_side = 1;
@@ -80,15 +80,15 @@
   /* 2. [BREAKBURST] state: */
   // 2.1 [RECV]: max cells received continuously
   client_machine->states[2].contin_recv_length_dist.type = CIRCPAD_DIST_WEIBULL;
-  client_machine->states[2].contin_recv_length_dist.param1 = 1.3851158160516734;
-  client_machine->states[2].contin_recv_length_dist.param2 = 8.78773833722796;
+  client_machine->states[2].contin_recv_length_dist.param1 = 1.3832926042292748;
+  client_machine->states[2].contin_recv_length_dist.param2 = 8.766888541863576;
   //client_machine->states[2].contin_recv_start_length = 1;
   //client_machine->states[2].contin_recv_max_length = 30;
 
   // 2.2 [SEND]: max padding cells sent continuously 
-  client_machine->states[2].contin_padding_sent_length_dist.type =  CIRCPAD_DIST_GEOMETRIC;
-  client_machine->states[2].contin_padding_sent_length_dist.param1 = 0.48088476423682447;
-  //client_machine->states[2].contin_padding_sent_length_dist.param2 = 0.023510946115248847;
+  client_machine->states[2].contin_padding_sent_length_dist.type =  CIRCPAD_DIST_PARETO;
+  client_machine->states[2].contin_padding_sent_length_dist.param1 = 1.9667283364576538;
+  client_machine->states[2].contin_padding_sent_length_dist.param2 = 0.05282296143414936;
   //client_machine->states[2].contin_padding_sent_start_length = 2;
   //client_machine->states[2].contin_padding_sent_max_length = 5;
 
@@ -97,8 +97,8 @@
 
   // 2.3 [BREAKBURST] state transition.
   client_machine->states[2].next_state[CIRCPAD_EVENT_PADDING_SENT] = 2;
-  client_machine->states[2].next_state[CIRCPAD_EVENT_PADDING_RECV] = 2;
   client_machine->states[2].next_state[CIRCPAD_EVENT_NONPADDING_RECV] = 2;
+  client_machine->states[2].next_state[CIRCPAD_EVENT_PADDING_RECV] = 2;
   client_machine->states[2].next_state[CIRCPAD_EVENT_NONPADDING_SENT] = 1;
 
 /*****************************  [END OF STATES]  *****************************/
@@ -110,5 +110,5 @@
   circpad_register_padding_machine(client_machine, origin_padding_machines);
 
   /* [LOGGING] : */
-  log_info(LD_CIRC, "[AUGUST_CLIENT] Registered the AUGUST client padding machine (%u)", client_machine->machine_num);
+  log_info(LD_CIRC, "[OCTOBER_CLIENT] Registered the OCTOBER client padding machine (%u)", client_machine->machine_num);
   
