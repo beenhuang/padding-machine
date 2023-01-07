@@ -78,15 +78,15 @@
   /* 2. [BREAKBURST] state: */
   // 2.1 [RECV]: max cells received continuously
   client_machine->states[2].contin_recv_length_dist.type = CIRCPAD_DIST_WEIBULL;
-  client_machine->states[2].contin_recv_length_dist.param1 = 1.7040375147180462;
-  client_machine->states[2].contin_recv_length_dist.param2 = 5.354952111812544;
+  client_machine->states[2].contin_recv_length_dist.param1 = 1.6654098669893893;
+  client_machine->states[2].contin_recv_length_dist.param2 = 5.636855668373919;
   //client_machine->states[2].contin_recv_start_length = 1;
   //client_machine->states[2].contin_recv_max_length = 30;
 
   // 2.2 [SEND]: max padding cells sent continuously 
-  client_machine->states[2].contin_padding_sent_length_dist.type =  CIRCPAD_DIST_GEOMETRIC;
-  client_machine->states[2].contin_padding_sent_length_dist.param1 = 0.4872062169684204;
-  //client_machine->states[2].contin_padding_sent_length_dist.param2 = 0.023510946115248847;
+  client_machine->states[2].contin_padding_sent_length_dist.type =  CIRCPAD_DIST_PARETO;
+  client_machine->states[2].contin_padding_sent_length_dist.param1 = 1.979057415032052;
+  client_machine->states[2].contin_padding_sent_length_dist.param2 = 0.03733630342223472;
   //client_machine->states[2].contin_padding_sent_start_length = 2;
   //client_machine->states[2].contin_padding_sent_max_length = 5;
 
