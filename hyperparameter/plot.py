@@ -7,6 +7,22 @@
 
 import matplotlib.pyplot as plt
 
+def show_bar_plot2(x, y, plt_title, x_label, y_label):
+    fig, ax = plt.subplots()
+    ax.get_yaxis().get_major_formatter().set_scientific(False)
+    
+    #ax.yaxis.set_major_formatter("{:n}".format(y))
+
+    ax.bar(x, y)
+
+    ax.set_xticks(ticks=x, fontproperties="Arial", size=13)
+    #ax.set_yticks(ticks=y, fontproperties="Arial", size=13)
+
+    ax.set_xlabel(x_label, fontsize=13, fontfamily="Arial")
+    ax.set_ylabel(y_label, fontsize=13, fontfamily="Arial")
+    #ax.set_title(plt_title, fontsize=13, fontfamily="Arial")
+
+    plt.show()    
 
 def show_bar_plot(x, y, plt_title, x_label, y_label):
     #fig, ax = plt.subplots()
@@ -33,8 +49,6 @@ def save_bar_plot(x, y, file, plt_title, x_label, y_label):
 
     plt.savefig(file)
     plt.close()
-
-
 
 
 

@@ -115,15 +115,11 @@ def preprocess_data(file):
 def spilt_dataset(X, y):
     # split to train & test [8:2]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=247, stratify=y)
-    # split to validation & test [1:1]
-    #X_valid, X_test, y_valid, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=247, stratify=y_test)
-
+ 
     train_data = DFDataset(X_train, y_train)
-    #valid_data = DFDataset(X_valid, y_valid)
     test_data = DFDataset(X_test, y_test)
 
     print(f"[SPLITED] traning size: {len(train_data)}, test size: {len(test_data)}")
-    #print(f"[SPLITED] traning size: {len(train_data)}, validation size: {len(valid_data)}, test size: {len(test_data)}")
 
     return train_data, test_data
   
@@ -211,197 +207,150 @@ def test(dataloader, model, device, classes):
 
         print(f"[testing] prediction: {len(pred)}, label: {len(label)}")
     
-    lines = get_openworld_score(label, pred, max(label))
-   
-    '''
-    threshold = np.append([0], 1.0 - 1 / np.logspace(0.05, 2, num=15, endpoint=True))
-    threshold = np.around(threshold, decimals=4)
-    lines = []
-    for th in threshold: 
-        # compute metrics
-        tp, fpp, fpn, tn, fn, accuracy, recall, precision, f1 = df_metrics(th, pred, label, classes)
+    lines, tpr, fpr = get_openworld_score(label, pred, max(label))
 
-        lines.append(f"[METRICS] TP: [{tp}] , FP-P: [{fpp}] , FP-N: [{fpn}] , TN: [{tn}] , FN: [{fn:>5}]\n")
-        lines.append(f"[METRICS_1] threshold: [{th:4.2}], accuracy: [{accuracy:4.2}]\n")
-        lines.append(f"[METRICS_2] precision: [{precision:4.2}] , recall: [{recall:4.2}] , F1: [{f1:4.2}]\n\n")
-    '''
+    return lines, tpr, fpr 
 
-    return lines 
-
-
-
-def df_metrics(threshold, pred, label, label_unmon):
-    # TP, FP-P, FP-N, TN, FN
-    tp, fpp, fpn, tn, fn = 0, 0, 0, 0, 0
-
-    # traverse preditions
-    for i in range(len(pred)):
-        
-        # get prediction
-        label_pred = np.argmax(pred[i]) # predicted label
-        
-        prob_pred = max(pred[i]) # probability
-        
-        label_correct = label[i] # true label
-
-        # we split on monitored or unmonitored correct label
-        if label_correct != label_unmon:
-            # either confident and correct,
-            if prob_pred >= threshold and label_pred == label_correct:
-                tp = tp + 1
-            # confident and wrong monitored label, or
-            elif prob_pred >= threshold and label_pred != label_unmon:
-                fpp = fpp + 1
-            # wrong because not confident or predicted unmonitored for monitored
-            else:
-                fn = fn + 1
-        else:
-            if prob_pred < threshold or label_pred == label_unmon: # correct prediction?
-                tn = tn + 1
-            elif label_pred < label_unmon: # predicted monitored for unmonitored
-                fpn = fpn + 1
-            else: # this should never happen
-                sys.exit(f"this should never, wrongly labelled data for {label_pred}")
-
-    # 
-    # compute recall
-    if tp + fn + fpp > 0:
-        recall = round(float(tp) / float(tp + fpp + fn), 4)
-  
-    # compute precision      
-    if tp + fpp + fpn > 0:
-        precision = round(float(tp) / float(tp + fpp + fpn), 4)
-
-    # compute F1
-    if precision > 0 and recall > 0:
-        f1 = round(2*((precision*recall)/(precision+recall)), 4)
-
-    # compute accuracy
-    accuracy = round(float(tp + tn) / float(tp + fpp + fpn + fn + tn), 4)
-
-    
-    return tp, fpp, fpn, tn, fn, accuracy, recall, precision, f1
-
-
-
-# [FUNC] get metrics values
-def get_openworld_score(y_true, y_pred, label_unmon):
-    print(f"label_unmon: {label_unmon}")
-    # TP-correct, TP-incorrect, FN  TN, FN
-    tp_c, tp_i, fn, tn, fp = 0, 0, 0, 0, 0
+# get binary classification score
+def get_binary_score(y_true, y_pred, label_unmon):
+    # TP, FN  TN, FN
+    tp, fn, tn, fp = 0, 0, 0, 0
 
     # traverse preditions
     for i in range(len(y_pred)):
-        pred_label = np.argmax(y_pred[i])
-
         # [case_1]: positive sample, and predict positive and correct.
-        if y_true[i] != label_unmon and pred_label != label_unmon and pred_label == y_true[i]:
-            tp_c += 1
-        # [case_2]: positive sample, predict positive but incorrect class.
-        elif y_true[i] != label_unmon and pred_label != label_unmon and pred_label != y_true[i]:
-            tp_i += 1
+        if y_true[i] != label_unmon and y_pred[i] == y_true[i]:
+            tp += 1
         # [case_3]: positive sample, predict negative.
-        elif y_true[i] != label_unmon and pred_label == label_unmon:
+        elif y_true[i] != label_unmon and y_pred[i] != y_true[i]:
             fn += 1
         # [case_4]: negative sample, predict negative.    
-        elif y_true[i] == label_unmon and pred_label == y_true[i]:
+        elif y_true[i] == label_unmon and y_pred[i] == y_true[i]:
             tn += 1
         # [case_5]: negative sample, predict positive    
-        elif y_true[i] == label_unmon and pred_label != y_true[i]:
+        elif y_true[i] == label_unmon and y_pred[i] != y_true[i]:
             fp += 1   
         else:
-            sys.exit(f"[ERROR]: {pred_label}, {y_true[i]}")        
+            sys.exit(f"[ERROR]: {y_pred[i]}, {y_true[i]}")        
 
     # accuracy
-    accuracy = (tp_c+tn) / float(tp_c+tp_i+fn+tn+fp)
+    accuracy = (tp+tn) / float(tp+fn+tn+fp)
     # precision      
-    precision = tp_c / float(tp_c+tp_i+fp)
+    precision = tp / float(tp+fp)
     # recall
-    recall = tp_c / float(tp_c+tp_i+fn)
+    recall = tp / float(tp+fn)
     # F-score
     f1 = 2*(precision*recall) / float(precision+recall)
+    # FPR
+    fpr = fp / float(fp+tn)
 
     lines = []
-    lines.append(f"[POS] TP-c: {tp_c},  TP-i(incorrect class): {tp_i},  FN: {fn}\n")
+    lines.append(f"[POS] TP: {tp},  FN: {fn}\n")
     lines.append(f"[NEG] TN: {tn},  FP: {fp}\n\n")
     lines.append(f"accuracy: {accuracy}\n")
     lines.append(f"precision: {precision}\n")
-    lines.append(f"recall: {recall}\n")
+    lines.append(f"recall (TPR): {recall}\n")
     lines.append(f"F1: {f1}\n")
-    return lines
+    lines.append(f"FPR: {fpr}\n\n\n")
+    
+    return lines, recall, fpr
+
+def choose_one_mon_class(data, labels, mon_label, unmon_label):
+    X, y = [], []
+    MAX_INSTANCE = 100000
+    n = 0
+
+    for index, label in enumerate(labels):
+        if mon_label == label:
+            X.append(data[index])
+            y.append(labels[index])
+        
+        if unmon_label == label and n < MAX_INSTANCE:
+            n += 1
+            X.append(data[index])
+            y.append(labels[index])
+
+    return X, y  
 
 # main function
-def main():
-    logger = get_logger()
-    logger.info(f"{MODULE_NAME}: start to run.")
-
-    # parse commmand arguments & configuration file
-    args, config = parse_arguments()
-    logger.info(f"args: {args}, config: {config}")
-
-    EPOCH = int(config["epoch"])
-    BATCH_SIZE = int(config["batch_size"])
-    CLASSES = int(config["num_mon_site"])+1 # monitored + 1(unmonitored)
+def main(input, output, epoch, batch_size, logger):
+    EPOCH = epoch
+    BATCH_SIZE = batch_size
+    CLASSES = 2 # 1-monitored + 1-unmonitored
 
     # 1. load dataset
-    X, y = preprocess_data(join(INPUT_DIR, args["in"]))
-    train_data, test_data = spilt_dataset(X, y)
-
+    infile = join(INPUT_DIR, input)
+    data, labels = preprocess_data(infile)
+    
     # select cpu/gpu mode
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"device: {device}")
+
+    tpr, fpr, n = 0.0, 0.0, 0
+    # loop: select one monitored class with one unmonitored class
+    for mon_label in range(max(labels)):
+        n += 1
+        print(f"mon_label: {mon_label}")
+        X, y = choose_one_mon_class(data, labels, mon_label, max(labels))
+        logger.info(f"[GOT] X_length:{len(X)}, y_length:{len(y)}, labels:{list(set(y))}")
+
+        # split data
+        train_data, test_data = spilt_dataset(X, y)
     
-############   TRAINING   ###############
+        # train
+        logger.info(f"----- [TRAINING] start to train the DF model -----")
 
-    logger.info(f"----- [TRAINING] start to train the DF model -----")
+        train_dataloader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
+   
+        # create DFNet model    
+        df_net = DFNet(CLASSES).to(device)         
+        # loss function:
+        loss_function = nn.CrossEntropyLoss()
+        # optimizer:
+        optimizer = Adamax(params=df_net.parameters())
 
-    # training/validation dataloader: 
-    train_dataloader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
-    #valid_dataloader = DataLoader(valid_data, batch_size=BATCH_SIZE, shuffle=True)
+        # training loop
+        for i in range(EPOCH):
+            logger.info(f"---------- Epoch {i+1} ----------")
 
-    # create DFNet model    
-    df_net = DFNet(CLASSES).to(device)         
-    # loss function:
-    loss_function = nn.CrossEntropyLoss()
-    # optimizer:
-    optimizer = Adamax(params=df_net.parameters())
-
-    # training loop
-    for i in range(EPOCH):
-        logger.info(f"---------- Epoch {i+1} ----------")
-
-        # train DF model
-        train_loop(train_dataloader, df_net, loss_function, optimizer, device)
-        # validate DF model
-        #validate_loop(valid_dataloader, df_net, device)
-
-    logger.info(f"----- [TRAINING] Completed -----")
-
-    # save trained DF model
-    #torch.save(df_net, join(TRAINED_DF_DIR, args["model"]))
-    #logger.info(f"[SAVED] the trained DF model to the {args['model']}")
-
-    # load trained DF model
-    #df_net = torch.load(join(TRAINED_DF_DIR, args["model"])).to(device)
-    #logger.info(f"[LOADED] the trained DF model, file-name: {args['model']}")
-
-############   TESTING   ################# 
-    logger.info(f"----- [TESTING] start to test the DF model -----")
-
-    # test dataloader:
-    test_dataloader = DataLoader(test_data, batch_size=BATCH_SIZE)
-
-    # run test
-    lines = test(test_dataloader, df_net, device, CLASSES)
-    
-    # save testing results
-    with open(join(OUTPUT_DIR, args["out"]+".txt"), "w") as f:
-        f.writelines(lines)
-        logger.info(f"[SAVED] testing results, file-name: {args['out']}")
+            # train DF model
+            train_loop(train_dataloader, df_net, loss_function, optimizer, device)
+      
+        logger.info(f"----- [TRAINING] Completed -----")
 
 
+        # test
+        logger.info(f"----- [TESTING] start to test the DF model -----")
+
+        # test dataloader:
+        test_dataloader = DataLoader(test_data, batch_size=BATCH_SIZE)
+
+        # run test
+        lines, tmp_tpr, tmp_fpr = test(test_dataloader, df_net, device, CLASSES)
+        tpr += tmp_tpr
+        fpr += tmp_fpr
+        logger.info(f"[CALCULATED] metrics, TPR:{tmp_tpr}, FPR:{tmp_fpr}.")
+   
+        # save testing results
+        outfile = join(OUTPUT_DIR, output+".txt")
+        with open(outfile, "a") as f:
+            f.writelines(lines)
+            logger.info(f"[SAVED] testing results, file-name: {args['out']}")
+
+    logger.info(f"TPR:{tpr/n}, FPR:{fpr/n}, num_loop:{n}")
     logger.info(f"{MODULE_NAME}: complete successfully.\n")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        logger = get_logger()
+        logger.info(f"{MODULE_NAME}: start to run.")
+
+        # parse commmand arguments & configuration file
+        args, config = parse_arguments()
+        logger.info(f"args: {args}, config: {config}")
+
+        main(args["in"], args["out"], int(config["epoch"]), int(config["batch_size"])logger=logger)
+
+    except KeyboardInterrupt:
+        sys.exit(1) 

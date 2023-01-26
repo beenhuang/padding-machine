@@ -2,7 +2,7 @@
 
 """
 <file>    overhead.py
-<brief>   compute bandwidth overhead.
+<brief>   evaluate bandwidth overhead for the defended trace.
 """
 
 import argparse
@@ -19,7 +19,7 @@ from os.path import join, basename, abspath, splitext, dirname, pardir, isdir
 MODULE_NAME = basename(__file__)
 CURRENT_TIME = time.strftime("%Y.%m.%d-%H:%M:%S_", time.localtime())
 
-BASE_DIR = abspath(join(dirname(__file__), pardir))
+BASE_DIR = abspath(join(dirname(__file__), pardir, pardir))
 INPUT_DIR = join(BASE_DIR, "simulation", "sim-traces")
 OUTPUT_DIR = join(BASE_DIR, "results")
 
@@ -29,23 +29,20 @@ PADDING_SENT = 2.0
 PADDING_RECV = -2.0
 
 
-#
 def get_logger():
-    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO)
+    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO, datefmt = "%Y-%m-%d %H:%M:%S")
     logger = logging.getLogger(splitext(basename(__file__))[0])
     
     return logger
 
-
-# [FUNC] parse arugment
 def parse_arguments():
     # argument parser
     parser = argparse.ArgumentParser(description="k-FP")
 
-    # 1. INPUT: load ds-*.pkl dataset
-    parser.add_argument("-i", "--in", required=True, metavar="<simulated-traces>", help="load simulated traces from pickle file")
-    # 2. OUTPUT: save overhead in the overhead-*.txt file
-    parser.add_argument("-o", "--out", required=True, metavar="<result-file>", help="save overhead to the text file")
+    # 1. INPUT: (pickle file) load the dataset defended by the padding machine.
+    parser.add_argument("-i", "--in", required=True, metavar="<simulated-traces>", help="load simulated traces from a pickle file")
+    # 2. OUTPUT: (text file) save bandwidth overhead in the text file.
+    parser.add_argument("-o", "--out", required=True, metavar="<result-file>", help="save bandwidth overhead to the text file")
 
     args = vars(parser.parse_args())
 
@@ -68,10 +65,10 @@ def get_cell_count(dataset):
 
         # sent_nonpadding == 0:
         if cell_count[NONPADDING_SENT] == 0:
-            sys.exit(f"[WARN] sent nonpadding cells: [0]")
+            sys.exit(f"[WARN] sent nonpadding cells: 0")
         # recv_nonpadding == 0
         elif cell_count[NONPADDING_RECV] == 0:  
-            sys.exit(f"[WARN] recv nonpadding cells: [0]")
+            sys.exit(f"[WARN] recv nonpadding cells: 0")
 
         sent_nonpadding += cell_count[NONPADDING_SENT]
         recv_nonpadding += cell_count[NONPADDING_RECV]
@@ -121,24 +118,30 @@ def get_bandwidth_overhead(dataset, sent_nonpadding, sent_padding, recv_nonpaddi
     lines.append(f"Avg recv bandwidth: recv/recv_nonpadding= {avg_recv:.0%} \n\n")
 
     # total bandwidth average
-    lines.append(f"Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= {avg_total:.0%}") 
+    lines.append(f"Avg total bandwidth: (sent+recv)/(sent_nonpadding+recv_nonpadding)= {avg_total:.0%}\n\n\n") 
 
 
     return lines   
 
 
-# MAIN FUNCTION
-def main():
-    logger = get_logger()
-    
-    logger.info(f"{MODULE_NAME}: start to run.")
+# main function
+def main(input, output, logger):
+    """
+    Run the bandwidth overhead evaluation on a defended trace.
 
-    # parse arguments
-    args = parse_arguments()
-    logger.info(f"Arguments: {args}")
+    Parameters
+    ----------
+    input: str
+        Operating system file path to the directory containing processed feature files.
+    output: str
+        Operating system file path to the directory where analysis results should be saved.
+    logger : object
+        logger object is used to log the message when running the program.
+    """
 
-    # [1] load dataset & label:
-    with open(join(INPUT_DIR, args["in"]), "rb") as f:
+    # [1] load the defended traces named <input>.
+    input_file = join(INPUT_DIR, input)
+    with open(input_file, "rb") as f:
         dataset, _ = pickle.load(f)
     logger.info(f"[LOADED] dataset from the {args['in']}")    
 
@@ -149,15 +152,26 @@ def main():
     logger.info(f"[CALCULATED] bandwidth overhead")
     
 
-    # [3] write bandwidth overhead to the file.
-    with open(join(OUTPUT_DIR, args["out"]+".txt"), "w") as f:
+    # [3] write bandwidth overhead to the file named <output>.
+    output_file = join(OUTPUT_DIR, output+".txt")
+    with open(output_file, "a") as f:
         f.writelines(lines)
-        logger.info(f"[SAVED] bandwidth overhead in the {args['out']}")
+        logger.info(f"[SAVED] bandwidth overhead in the {output}")
 
 
     logger.info(f"{MODULE_NAME}: complete successfully.\n")
         
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        # generate logger
+        logger = get_logger()
+        logger.info(f"{MODULE_NAME}: start to run.")
 
+        # parse arguments
+        args = parse_arguments()
+        logger.info(f"Arguments: {args}")
+        
+        main(args["in"], args["out"], logger)
+    except KeyboardInterrupt:
+        sys.exit(-1)

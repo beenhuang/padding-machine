@@ -77,4 +77,3 @@ if __name__ == "__main__":
     result.plot()
     plt.show()
 
-

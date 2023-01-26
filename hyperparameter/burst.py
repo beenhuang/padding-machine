@@ -17,7 +17,7 @@ import multiprocessing as mp
 from os.path import join, basename, abspath, dirname, pardir, isdir, splitext 
 
 from dist_fit import fit_data_to_dist
-from plot import save_bar_plot, show_bar_plot
+from plot import save_bar_plot, show_bar_plot2
 
 
 # CONSTANTS
@@ -59,10 +59,10 @@ def parse_arguments():
 
 def get_burst_trace(trace):
     trace = trace[:,1]
-    print(f"trace: {trace}")
+    #print(f"trace: {trace}")
     trace[trace == PADDING_SENT] = NONPADDING_SENT
     trace[trace == PADDING_RECV] = NONPADDING_RECV   
-    print(f"new_trace: {trace}")
+    #print(f"new_trace: {trace}")
 
     return [sum(list(group)) for _,group in itertools.groupby(trace)]
 
@@ -98,8 +98,8 @@ def make_burst_plot(bursts, file):
         for line in list(zip(unique_total, count_total)):
             f.write(str(line)+"\n") 
 
-    #show_bar_plot(unique_send[:30], count_send[:30], "SEND BURST", "send burst", "count")
-    #show_bar_plot(unique_recv[:50], count_recv[:50], "RECV BURST", "recv burst", "count")     
+    show_bar_plot2(unique_send[:15], count_send[:15], "SEND BURST", "send burst", "count")
+    show_bar_plot2(unique_recv[:15], count_recv[:15], "RECV BURST", "recv burst", "count")     
 
     # save
     for max_index in range(10, 210, 10):
@@ -113,11 +113,11 @@ def get_burst_distfit(bursts):
     send_burst = all_bursts[all_bursts > 0]
     recv_burst = -all_bursts[all_bursts < 0] 
     
-    recv_max = 5
+    recv_max = 6
     #recv_burst = recv_burst[recv_burst > 9]
     recv_burst = recv_burst[recv_burst < recv_max]
     
-    send_max = 22
+    send_max = 6
     send_burst = send_burst[send_burst < send_max]
     
     todo = [[send_burst, "uniform"], [send_burst, "logistic"],
@@ -155,11 +155,12 @@ def main():
     
 
     # 3. save burst plot
-    #logger.info(f"MAKING burst plots ...")
-    #make_burst_plot(bursts, f"all-{args['out']}")
+    logger.info(f"MAKING burst plots ...")
+    make_burst_plot(bursts, f"all-{args['out']}")
     #make_burst_plot(mon_bursts, f"mon-{args['out']}")
     #make_burst_plot(unmon_bursts, f"unmon-{args['out']}")    
-    #logger.info(f"MAKED burst plots.")
+    logger.info(f"MAKED burst plots.")
+    sys.exit(0)
 
     # 4. fit data to distribution
     logger.info(f"FITTING burst to the distribution ...")

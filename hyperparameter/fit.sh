@@ -1,14 +1,19 @@
 #!/bin/bash
 
-# fit burst to distribution and save plot
-#          
-# burst.py --in <> --out <>
-#
+# <brief>: fit burst to distribution and save plot      
+# ./burst.py --in <input> --out <output>
+
+
+burst_in=0111-original-1-5000.pkl
+burst_out=original-burst
 
 echo "---------------     BURST     ---------------"
-./burst.py --in 2022.10.23-09:55:05_original-5000.pkl --out burst-origin
+./burst.py --in $burst_in --out $burst_out
 
-echo "---------------     INTER-ARRIVAL  TIME     ---------------"
-./iat.py --in 2022.10.23-09:55:05_original-5000.pkl --out iat-origin
 
+iat_in=2022.10.23-09:55:05_original-5000.pkl
+iat_out=iat-origin-10-30
+
+#echo "---------------     INTER-ARRIVAL  TIME     ---------------"
+#./iat.py --in $iat_in --out $iat_out
 
