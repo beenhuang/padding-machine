@@ -40,7 +40,7 @@ PADDING_SENT = 2.0
 PADDING_RECV = -2.0
 
 def get_logger():
-    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO)
+    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO, datefmt = "%Y-%m-%d %H:%M:%S")
     logger = logging.getLogger(splitext(basename(__file__))[0])
     
     return logger
@@ -49,7 +49,7 @@ def get_logger():
 # [FUNC] parse arugment
 def parse_arguments():
     # argument parser
-    parser = argparse.ArgumentParser(description="CUMUL")
+    parser = argparse.ArgumentParser(description="k-FP")
 
     # 1. INPUT: load ds-*.pkl dataset
     parser.add_argument("-i", "--in", required=True, metavar="<trace file directory>", help="load trace data")
@@ -79,7 +79,7 @@ def generate_feature_vectors(data_file):
 
 
 def train_cumul(X_train, y_train):
-    model = Pipeline([("standardscaler", StandardScaler()), ("svc", SVC(kernel="rbf", C=2048, gamma=0.015625))])
+    model = Pipeline([('standardscaler', StandardScaler()), ('svc', SVC(kernel='rbf', C=2048, gamma=0.015625))])
     model.fit(X_train, y_train)
 
     return model
@@ -123,6 +123,8 @@ def get_openworld_score(y_true, y_pred, label_unmon):
     recall = tp_c / float(tp_c+tp_i+fn)
     # F-score
     f1 = 2*(precision*recall) / float(precision+recall)
+    # FPR
+    fpr = fp / float(fp+tn)
 
     lines = []
     lines.append(f"[POS] TP-c: {tp_c},  TP-i(incorrect class): {tp_i},  FN: {fn}\n")
@@ -131,7 +133,7 @@ def get_openworld_score(y_true, y_pred, label_unmon):
     lines.append(f"precision: {precision}\n")
     lines.append(f"recall: {recall}\n")
     lines.append(f"F1: {f1}\n")
-    
+    lines.append(f"FPR: {fpr}\n\n\n")
     return lines
 
 
@@ -236,7 +238,7 @@ def main():
     lines = get_openworld_score(y_test, y_pred, max(y_test))
     logger.info(f"[CALCULATED] metrics.")
     
-    with open(join(OUTPUT_DIR, args["out"]+".txt"), "w") as f:
+    with open(join(OUTPUT_DIR, args["out"]+".txt"), "a") as f:
         f.writelines(lines)
         logger.info(f"[SAVED] results in the {args['out']}.")
 

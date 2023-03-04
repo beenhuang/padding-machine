@@ -46,7 +46,7 @@ PADDING_RECV = -2.0
 
 #
 def get_logger():
-    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO)
+    logging.basicConfig(format="[%(asctime)s]>>> %(message)s", level=logging.INFO, datefmt = "%Y-%m-%d %H:%M:%S")
     logger = logging.getLogger(splitext(basename(__file__))[0])
     
     return logger
@@ -62,9 +62,6 @@ def parse_arguments():
     # OUTPUT: save test resulting.
     parser.add_argument("-o", "--out", required=True, 
                         help="save test results.")
-    # TRAINING: do run training
-    parser.add_argument("--train", required=False, action="store_true", 
-                        default=False, help="do run training DF model.")
     # TRAINING_output: save trained DF model.
     parser.add_argument("-m", "--model", required=False, 
                         help="save trained DF model.")
@@ -100,14 +97,14 @@ def preprocess_data(file):
 
     X = []
     for elem in dataset:
-        direct_trace = [row[1] for row in elem.tolist()]
+        direct_trace = [row[1] for row in elem.tolist()] # used in Pulls's data
+        #direct_trace = [row for row in elem.tolist()] # used in Rimmer's data
         direct_trace = direct_trace + [0] * (5000 - len(direct_trace))
         trace = np.array([direct_trace[:5000]], dtype=np.float32)
         trace[trace == PADDING_SENT] = NONPADDING_SENT
         trace[trace == PADDING_RECV] = NONPADDING_RECV    
         X.append(trace)
     
-
     return X, y     
 
 
@@ -185,7 +182,7 @@ def validate_loop(dataloader, model, device):
     print(f"[validating] Accuracy: {correct}/{ds_size} = {correct/ds_size}")
 
 
-# [FUNC]: test DF model
+# Test DF
 def test(dataloader, model, device, classes):
     # prediction, true label
     pred, label = [], []
@@ -212,79 +209,10 @@ def test(dataloader, model, device, classes):
         print(f"[testing] prediction: {len(pred)}, label: {len(label)}")
     
     lines = get_openworld_score(label, pred, max(label))
-   
-    '''
-    threshold = np.append([0], 1.0 - 1 / np.logspace(0.05, 2, num=15, endpoint=True))
-    threshold = np.around(threshold, decimals=4)
-    lines = []
-    for th in threshold: 
-        # compute metrics
-        tp, fpp, fpn, tn, fn, accuracy, recall, precision, f1 = df_metrics(th, pred, label, classes)
-
-        lines.append(f"[METRICS] TP: [{tp}] , FP-P: [{fpp}] , FP-N: [{fpn}] , TN: [{tn}] , FN: [{fn:>5}]\n")
-        lines.append(f"[METRICS_1] threshold: [{th:4.2}], accuracy: [{accuracy:4.2}]\n")
-        lines.append(f"[METRICS_2] precision: [{precision:4.2}] , recall: [{recall:4.2}] , F1: [{f1:4.2}]\n\n")
-    '''
 
     return lines 
 
-
-
-def df_metrics(threshold, pred, label, label_unmon):
-    # TP, FP-P, FP-N, TN, FN
-    tp, fpp, fpn, tn, fn = 0, 0, 0, 0, 0
-
-    # traverse preditions
-    for i in range(len(pred)):
-        
-        # get prediction
-        label_pred = np.argmax(pred[i]) # predicted label
-        
-        prob_pred = max(pred[i]) # probability
-        
-        label_correct = label[i] # true label
-
-        # we split on monitored or unmonitored correct label
-        if label_correct != label_unmon:
-            # either confident and correct,
-            if prob_pred >= threshold and label_pred == label_correct:
-                tp = tp + 1
-            # confident and wrong monitored label, or
-            elif prob_pred >= threshold and label_pred != label_unmon:
-                fpp = fpp + 1
-            # wrong because not confident or predicted unmonitored for monitored
-            else:
-                fn = fn + 1
-        else:
-            if prob_pred < threshold or label_pred == label_unmon: # correct prediction?
-                tn = tn + 1
-            elif label_pred < label_unmon: # predicted monitored for unmonitored
-                fpn = fpn + 1
-            else: # this should never happen
-                sys.exit(f"this should never, wrongly labelled data for {label_pred}")
-
-    # 
-    # compute recall
-    if tp + fn + fpp > 0:
-        recall = round(float(tp) / float(tp + fpp + fn), 4)
-  
-    # compute precision      
-    if tp + fpp + fpn > 0:
-        precision = round(float(tp) / float(tp + fpp + fpn), 4)
-
-    # compute F1
-    if precision > 0 and recall > 0:
-        f1 = round(2*((precision*recall)/(precision+recall)), 4)
-
-    # compute accuracy
-    accuracy = round(float(tp + tn) / float(tp + fpp + fpn + fn + tn), 4)
-
-    
-    return tp, fpp, fpn, tn, fn, accuracy, recall, precision, f1
-
-
-
-# [FUNC] get metrics values
+# Open-world Score
 def get_openworld_score(y_true, y_pred, label_unmon):
     print(f"label_unmon: {label_unmon}")
     # TP-correct, TP-incorrect, FN  TN, FN
@@ -320,6 +248,8 @@ def get_openworld_score(y_true, y_pred, label_unmon):
     recall = tp_c / float(tp_c+tp_i+fn)
     # F-score
     f1 = 2*(precision*recall) / float(precision+recall)
+    # FPR
+    fpr = fp / float(fp+tn)
 
     lines = []
     lines.append(f"[POS] TP-c: {tp_c},  TP-i(incorrect class): {tp_i},  FN: {fn}\n")
@@ -328,9 +258,11 @@ def get_openworld_score(y_true, y_pred, label_unmon):
     lines.append(f"precision: {precision}\n")
     lines.append(f"recall: {recall}\n")
     lines.append(f"F1: {f1}\n")
+    lines.append(f"FPR: {fpr}\n\n\n")
+    
     return lines
 
-# main function
+# [MAIN]
 def main():
     logger = get_logger()
     logger.info(f"{MODULE_NAME}: start to run.")
@@ -341,7 +273,7 @@ def main():
 
     EPOCH = int(config["epoch"])
     BATCH_SIZE = int(config["batch_size"])
-    CLASSES = int(config["num_mon_site"])+1 # monitored + 1(unmonitored)
+    CLASSES = int(config["classes"])
 
     # 1. load dataset
     X, y = preprocess_data(join(INPUT_DIR, args["in"]))
@@ -390,18 +322,15 @@ def main():
 
     # test dataloader:
     test_dataloader = DataLoader(test_data, batch_size=BATCH_SIZE)
-
     # run test
     lines = test(test_dataloader, df_net, device, CLASSES)
     
     # save testing results
-    with open(join(OUTPUT_DIR, args["out"]+".txt"), "w") as f:
+    with open(join(OUTPUT_DIR, args["out"]+".txt"), "a") as f:
         f.writelines(lines)
         logger.info(f"[SAVED] testing results, file-name: {args['out']}")
 
-
-    logger.info(f"{MODULE_NAME}: complete successfully.\n")
-
+    logger.info(f"{MODULE_NAME}: complete successfully.")
 
 if __name__ == "__main__":
     sys.exit(main())

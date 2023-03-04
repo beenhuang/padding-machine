@@ -1,28 +1,22 @@
 #!usr/bin/env python3
 
 """
-<file>    exfeature.py
-<brief>   extract the CUMUL feature from the trace data
+<file>    feature.py
+<brief>   extract CUMUL features from the trace
 """
 
 import numpy as np
 from os.path import abspath, dirname, join
 
-PACKET_SIZE = 514
-MAX_LENGTH = 100
 
 # 
 def get_general_trace(trace):
     #
-    # input: [[timestamp, direction], ...]
-    #
-    # output: [514, -514, ...]
-    #
     gen_total = []
-    direction_trace = trace[:,1].tolist()
+    trace = trace[:,1].tolist()
     
-    for direction in direction_trace:
-        gen_total.append(int(direction)*PACKET_SIZE)
+    for packet in trace:
+        gen_total.append(int(packet)*514)
 
     return gen_total
 
@@ -35,13 +29,13 @@ def transform_general_inout_trace(trace):
 
     return gen_in, gen_out 
 
-# max_length = 100
-def extract_features(trace, maxlength=MAX_LENGTH):
+
+def extract_features(trace, maxlength):
     if maxlength % 2 != 0 :
         sys.exit(f"[ERROR] feature_size is invalid.")
 
     all_features = []
-
+    #
     gen_total = get_general_trace(trace)
     gen_in, gen_out =  transform_general_inout_trace(gen_total)
 
@@ -49,6 +43,7 @@ def extract_features(trace, maxlength=MAX_LENGTH):
 
     # travel trace
     for packet in gen_total:
+        #
         if len(cumul_total) == 0: # first element
             cumul_total.append(packet)
             abs_total.append(packet)
@@ -56,17 +51,15 @@ def extract_features(trace, maxlength=MAX_LENGTH):
             cumul_total.append(cumul_total[-1] + packet)
             abs_total.append(abs_total[-1] + abs(packet))
 
-    # cumulative feature
+    # cumulative 
     cumul_feature = np.interp(np.linspace(abs_total[0], abs_total[-1], maxlength+1), abs_total, cumul_total) 
 
 
-    # [2] num of in/out trace
+    # num of in/out trace, packer_size of in/out trace
     all_features.append(len(gen_in)) 
     all_features.append(len(gen_out)) 
-    # [2] packet size of in/out trace
     all_features.append(abs(np.sum(gen_out)))
     all_features.append(abs(np.sum(gen_in)))
-    # [100] cumulative feature 
     all_features.extend(cumul_feature[1:])
 
 

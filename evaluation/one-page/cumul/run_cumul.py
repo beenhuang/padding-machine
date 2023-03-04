@@ -28,7 +28,7 @@ from exfeature import extract_features
 MODULE_NAME = basename(__file__)
 CURRENT_TIME = time.strftime("%Y.%m.%d-%H:%M:%S_", time.localtime())
 
-BASE_DIR = abspath(join(dirname(__file__), pardir, pardir))
+BASE_DIR = abspath(join(dirname(__file__), pardir, pardir, pardir))
 INPUT_DIR = join(BASE_DIR, "simulation", "sim-traces")
 OUTPUT_DIR = join(BASE_DIR, "results")
 
@@ -131,17 +131,22 @@ def get_binary_score(y_true, y_pred, label_unmon):
     
     return lines, recall, fpr
 
-
 def choose_one_mon_class(data, labels, mon_label, unmon_label):
     X, y = [], []
+    MAX_INSTANCE = 200
+    n = 0
 
     for index, label in enumerate(labels):
-        if mon_label == label or unmon_label == label:
+        if mon_label == label:
+            X.append(data[index])
+            y.append(labels[index])
+        
+        if unmon_label == label and n < MAX_INSTANCE:
+            n += 1
             X.append(data[index])
             y.append(labels[index])
 
-    return X, y        
-
+    return X, y       
 
 # MAIN function
 def main(input, output, logger):
@@ -150,9 +155,10 @@ def main(input, output, logger):
     data, labels = generate_feature_vectors(data_file)
     logger.info(f"[EXTRACTED] fatures, length: {len(data)}")
 
-    tpr, fpr = 0.0, 0.0
+    tpr, fpr, n = 0.0, 0.0, 0
     # loop: select one monitored class with one unmonitored class
     for mon_label in range(max(labels)):
+        n += 1
         print(f"mon_label: {mon_label}")
         X, y = choose_one_mon_class(data, labels, mon_label, max(labels))
         logger.info(f"[GOT] X_length:{len(X)}, y_length:{len(y)}, labels:{list(set(y))}")
@@ -179,7 +185,7 @@ def main(input, output, logger):
             f.writelines(lines)
             logger.info(f"[SAVED] results in the {output}.")
     
-    logger.info(f"TPR:{tpr/50}, FPR:{fpr/50}")
+    logger.info(f"TPR:{tpr/n}, FPR:{fpr/n}, num_loop:{n}")
     logger.info(f"{MODULE_NAME}: complete successfully.\n")
 
 

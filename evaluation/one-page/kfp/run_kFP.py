@@ -26,7 +26,7 @@ from exfeature import extract_features
 MODULE_NAME = basename(__file__)
 CURRENT_TIME = time.strftime("%Y.%m.%d-%H:%M:%S_", time.localtime())
 
-BASE_DIR = abspath(join(dirname(__file__), pardir, pardir))
+BASE_DIR = abspath(join(dirname(__file__), pardir, pardir, pardir))
 INPUT_DIR = join(BASE_DIR, "simulation", "sim-traces")
 OUTPUT_DIR = join(BASE_DIR, "results")
 
@@ -225,7 +225,11 @@ def main(input, output, logger):
             f.writelines(lines)
             logger.info(f"[SAVED] results in the {output}.")
     
-    logger.info(f"TPR:{tpr/n}, FPR:{fpr/n}, num_loop:{n}")
+    avg_value = f"avg_TPR:{tpr/n}, avg_FPR:{fpr/n}, num_loop:{n}\n"
+    with open(outfile, "a") as f:
+            f.write(avg_value)    
+            
+    logger.info(avg_value)
     logger.info(f"{MODULE_NAME}: complete successfully.\n")
 
 
@@ -242,3 +246,4 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         sys.exit(1)       
+

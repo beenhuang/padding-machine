@@ -9,18 +9,12 @@
 # df.py -i <ds-*.pkl> -lm <df-*.pkl> -o <res-*.csv> \ 
 #           
 
+data=rimmer.pkl
+outfile=1106-df
 
-for pkl in 2022.10.23-15:30:47_august-5000.pkl  2022.10.23-15:42:58_august-5000.pkl 2022.10.23-15:55:11_august-5000.pkl 2022.10.23-16:07:26_august-5000.pkl 2022.10.23-16:19:36_august-5000.pkl
-do
-    echo "---------------     RUN       ---------------"
-    ./run_df.py --in $pkl  --out df-august
-done
 
-:<<!
-# TRAINING:
-for pkl in 2022.10.22-13:19:21_interspace-5000.pkl          2022.10.22-13:26:20_interspace-5000.pkl    2022.10.22-13:33:15_interspace-5000.pkl    2022.10.22-13:40:07_interspace-5000.pkl   2022.10.22-13:46:58_interspace-5000.pkl  
-do
-    echo "---------------     RUN     ---------------"
-    ./run_df.py --in $pkl  --out df-interspace
-done
-!
+echo "---------------     RUN       ---------------"
+./run_df.py --in $data  --out $outfile
+
+
+

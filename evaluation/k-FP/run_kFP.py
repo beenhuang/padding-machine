@@ -41,7 +41,7 @@ PADDING_SENT = 2.0
 PADDING_RECV = -2.0
 
 def get_logger():
-    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO)
+    logging.basicConfig(format="[%(asctime)s] >> %(message)s", level=logging.INFO, datefmt = "%Y-%m-%d %H:%M:%S")
     logger = logging.getLogger(splitext(basename(__file__))[0])
     
     return logger
@@ -162,6 +162,8 @@ def get_metrics(y_true, y_pred, label_unmon):
     recall = tp_c / float(tp_c+tp_i+fn)
     # F-score
     f1 = 2*(precision*recall) / float(precision+recall)
+    # FPR
+    fpr = fp / float(fp+tn)
 
     lines = []
     lines.append(f"[POS] TP-c: {tp_c}, TP-i(incorrect class): {tp_i}, FN: {fn}\n")
@@ -170,6 +172,8 @@ def get_metrics(y_true, y_pred, label_unmon):
     lines.append(f"precision: {precision}\n")
     lines.append(f"recall: {recall}\n")
     lines.append(f"F1: {f1}\n")
+    lines.append(f"FPR: {fpr}\n\n\n")
+    
     return lines
 
 
@@ -203,7 +207,7 @@ def main():
     lines = get_metrics(y_test, y_pred, max(y_test))
     logger.info(f"[CALCULATED] metrics.")
     
-    with open(join(OUTPUT_DIR, args["out"]+".txt"), "w") as f:
+    with open(join(OUTPUT_DIR, args["out"]+".txt"), "a") as f:
         f.writelines(lines)
         logger.info(f"[SAVED] results in the {args['out']}.")
 
