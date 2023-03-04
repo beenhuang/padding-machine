@@ -16,7 +16,7 @@ This repository contains the source code for the WF defense described in the fol
 4. **k-FP:** ```./evaluation/k-FP/run_kFP.py --in "defended trace"  --out "result"```
 5. **DF:** ```./evaluation/df/run_df.py --in "defended trace"  --out "result"```
 
-OR, You can run the ```october.sh``` file, and other files are in the **"run" **directory. 
+OR, You can run the ```october.sh``` file, and other files are in the **"run"** directory. 
 
 ### Parameter Tuning
 1. **Get Original Trace:** run the ```./simulation/origin-trace.py --in standard --out "original trace"  --maxlength 5000``` command at the base directory. 
