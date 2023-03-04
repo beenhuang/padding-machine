@@ -98,8 +98,8 @@ def make_burst_plot(bursts, file):
         for line in list(zip(unique_total, count_total)):
             f.write(str(line)+"\n") 
 
-    show_bar_plot2(unique_send[:15], count_send[:15], "SEND BURST", "send burst", "count")
-    show_bar_plot2(unique_recv[:15], count_recv[:15], "RECV BURST", "recv burst", "count")     
+    show_bar_plot2(unique_send[:15], count_send[:15], "SEND BURST", "burst size", "count")
+    show_bar_plot2(unique_recv[:15], count_recv[:15], "RECV BURST", "burst size", "count")     
 
     # save
     for max_index in range(10, 210, 10):
@@ -183,4 +183,5 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
 

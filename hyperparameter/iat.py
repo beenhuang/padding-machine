@@ -142,7 +142,7 @@ def fit_iat_to_dist(iats):
     s2s_max = 30
     s2s = s2s[s2s < s2s_max]
     
-    r2r_max = 28
+    r2r_max = 48
     r2r = r2r[r2r < r2r_max]    
 
     todo = [[s2s, "uniform"], [s2s, "logistic"],
@@ -206,4 +206,5 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
