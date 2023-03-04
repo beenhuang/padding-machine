@@ -46,7 +46,7 @@ CIRCPAD_ADDRESS_EVENT = "connection_ap_handshake_send_begin"
 
 #
 def get_logger():
-    logging.basicConfig(format="%(asctime)s>> %(message)s", level=logging.INFO)
+    logging.basicConfig(format="[%(asctime)s]>>> %(message)s", level=logging.INFO, datefmt = "%Y-%m-%d %H:%M:%S")
     logger = logging.getLogger(splitext(basename(__file__))[0])
     
     return logger
@@ -213,6 +213,29 @@ def get_trace_files(dir):
 
     return files, labels
 
+def get_files_from_wang(dir):
+    # c/r_file: {"ID": "file", ...}, labels: {"ID": "labels", ...}
+    files, labels = [], {}
+    MAX_LABEL = 100
+
+    # get directories
+    c_dir = join(dir, "client-traces")
+    r_dir = join(dir, "fakerelay-traces")
+
+    for fname in os.listdir(c_dir):
+        if "-" in fname:
+            ID = f"m-{fname}"
+            labels[ID] = fname.split("-")[0]
+        else:
+            ID = f"u-{fname}"
+            labels[ID] = MAX_LABEL
+
+        files.append([ID, join(c_dir, fname), join(r_dir, fname)])
+
+    print(files)
+    print(labels)
+
+    return files, labels
 
 def main():
     logger = get_logger()
@@ -224,6 +247,7 @@ def main():
 
     # 1. get client/relay trace-files and labelss
     files, labels = get_trace_files(join(INPUT_DIR, args["in"]))
+    #files, labels = get_files_from_wang(join(INPUT_DIR, args["in"]))
     logger.info(f"[LOADED] {len(labels)} client/fake_relay files.")
 
     # 2. add client/relay machine to the test_circuitpadding_sim.c file
