@@ -13,7 +13,7 @@ This repository contains the source code for the WF defense described in the fol
 2. b
 3. c
 
-## Contact
+### Contact
 beenhuang@126.com
 
 Any discussions, suggestions, and questions are welcome!
