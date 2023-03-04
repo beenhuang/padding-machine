@@ -1,9 +1,8 @@
 #!/bin/bash
 
 
-infile=1106-august
-outfile=1106
-
+infile=1114-august-15-15-15-3-5000.pkl
+outfile=august-15-15-15-3
 
 # visualization
 echo "---------------     visualize    ---------------"

@@ -22,7 +22,7 @@ CURRENT_TIME = time.strftime("%Y.%m.%d-%H:%M:%S_", time.localtime())
 
 BASE_DIR = abspath(join(dirname(__file__), pardir, pardir))
 INPUT_DIR = join(BASE_DIR, "simulation", "sim-traces")
-OUTPUT_DIR = join(BASE_DIR, "evaluation", "visualization", "vis-results")
+OUTPUT_DIR = join(BASE_DIR, "analysis", "visualization", "result")
 
 NONPADDING_SENT = 1.0
 NONPADDING_RECV = -1.0
@@ -118,6 +118,10 @@ def main():
     image = Image.fromarray(get_img_data(dataset, Y_AXIS, X_AXIS))
     logger.info(f"[GOT] image data.")
 
+    # make "result" directory
+    if not exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+        
     # [3] write bandwidth overhead to the file.
     with open(join(OUTPUT_DIR, CURRENT_TIME+args["out"]+".png"), "wb") as f:
         image.save(f)
@@ -128,3 +132,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
